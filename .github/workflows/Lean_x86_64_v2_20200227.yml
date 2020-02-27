@@ -11,9 +11,9 @@ on:
   release:
     types: [published]
 
-  #push:
-  #  branches: 
-  #    - master
+  push:
+    branches: 
+      - master
 
   #schedule:
   #  - cron: 0 8 * * 5
@@ -112,17 +112,17 @@ jobs:
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
 
-    - name: Get Date
-      run: |
-        version=$(date +%Y-%m-%d)
-        echo "::set-env name=VERSION::$version"
-
     - name: Build firmware
       working-directory: ./openwrt
       run: |
         echo -e "$(nproc) thread build."
         make -j$(nproc) V=s
         #make -j1 V=s
+
+    - name: Get Date
+      run: |
+        version=$(date +%Y-%m-%d)
+        echo "::set-env name=VERSION::$version"
 
     - name : Upload artifact
       uses: actions/upload-artifact@master
