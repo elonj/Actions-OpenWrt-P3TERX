@@ -135,8 +135,8 @@ jobs:
       run: |
         cd openwrt/bin/targets/*/*
         rm -rf packages
-		rm -rf openwrt-x86-64-rootfs-squashfs.img
-		rm -rf openwrt-x86-64-vmlinuz
+        rm -rf openwrt-x86-64-rootfs-squashfs.img
+        rm -rf openwrt-x86-64-vmlinuz
         echo "::set-env name=FIRMWARE::$(pwd)"
         echo "::set-output name=status::success"
 
