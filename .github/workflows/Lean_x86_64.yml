@@ -6,19 +6,19 @@
 # Blog: https://p3terx.com
 #=================================================
 
-name: Build Openwrt Lean x86_64 v1
+name: Build Openwrt Lean x86_64
 
 on:
   release:
     types: [published]
 
-  #push:
-  #  branches:
-  #    - master
+  push:
+    branches:
+      - master
 
     paths:
-      - 'x86_64_v1.config'
-      - 'diy_v1.sh'
+      - 'x86_64.config'
+      - 'diy.sh'
 
    # 9:30 PM (21:30) UTC = 5:30 AM (5:30) Next Day GMT +08 
 #  schedule:
@@ -29,8 +29,8 @@ on:
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
-  CONFIG_FILE: 'x86_64_v1.config'
-  DIY_SH: 'diy_v1.sh'
+  CONFIG_FILE: 'x86_64.config'
+  DIY_SH: 'diy.sh'
   FREE_UP_DISK: true
   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: true
@@ -78,6 +78,9 @@ jobs:
         git clone https://github.com/vernesong/OpenClash.git
         mv OpenClash/luci-app-openclash ./luci-app-openclash
         rm -rf OpenClash
+        git clone https://github.com/Lienol/openwrt-package.git
+        mv openwrt-package/lienol/luci-app-ssr-python-pro-server ./luci-app-ssr-python-pro-server
+        rm -rf openwrt-package
 
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
@@ -123,7 +126,7 @@ jobs:
       uses: actions/upload-artifact@master
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
-        name: Openwrt_v1_${{ env.VERSION }}
+        name: Openwrt_${{ env.VERSION }}
         path: openwrt/bin
 
     - name: Organize files
@@ -132,6 +135,8 @@ jobs:
       run: |
         cd openwrt/bin/targets/*/*
         rm -rf packages
+        rm -rf openwrt-x86-64-rootfs-squashfs.img
+        rm -rf openwrt-x86-64-vmlinuz
         echo "::set-env name=FIRMWARE::$(pwd)"
         echo "::set-output name=status::success"
 
@@ -139,5 +144,5 @@ jobs:
       uses: actions/upload-artifact@master
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
-        name: Openwrt_firmware_v1_${{ env.VERSION }}
+        name: Openwrt_firmware_${{ env.VERSION }}
         path: ${{ env.FIRMWARE }}
