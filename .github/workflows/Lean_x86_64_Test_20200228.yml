@@ -86,6 +86,8 @@ jobs:
       run: |
         ./scripts/feeds clean
         ./scripts/feeds update -a
+        rm -rf ./feeds/luci/applications/luci-app-https-dns-proxy
+        rm -rf ./feeds/luci/applications/luci-app-vpn-policy-routing
         ./scripts/feeds install -a       
         ./scripts/feeds install -a
 
