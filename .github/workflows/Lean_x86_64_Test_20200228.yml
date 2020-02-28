@@ -67,7 +67,8 @@ jobs:
       env:
         FEEDS_CONFIG_FILE: 'feeds.conf_test.default'
       run: |
-       [ -e $FEEDS_CONFIG_FILE ] && mv $FEEDS_CONFIG_FILE openwrt/
+       rm -rf openwrt/feeds.conf.default
+       [ -e $FEEDS_CONFIG_FILE ] && mv $FEEDS_CONFIG_FILE openwrt/feeds.conf.default
        cd openwrt/package
        mkdir openwrt-packages
        cd openwrt-packages
