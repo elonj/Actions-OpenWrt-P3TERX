@@ -122,6 +122,9 @@ jobs:
         version=$(date +%Y-%m-%d)
         echo "::set-env name=VERSION::$version"
 
+    - name: Reduce file size
+      run: find openwrt/bin/targets/ -name "*rootfs*img*" -delete
+
     - name: Upload bin directory
       uses: actions/upload-artifact@master
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
@@ -135,8 +138,6 @@ jobs:
       run: |
         cd openwrt/bin/targets/*/*
         rm -rf packages
-        rm -rf openwrt-x86-64-rootfs-squashfs.img
-        rm -rf openwrt-x86-64-vmlinuz
         echo "::set-env name=FIRMWARE::$(pwd)"
         echo "::set-output name=status::success"
 
