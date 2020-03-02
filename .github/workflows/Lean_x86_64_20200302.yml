@@ -126,7 +126,9 @@ jobs:
         echo "::set-env name=VERSION::$version"
 
     - name: Reduce file size
-      run: find openwrt/bin/targets/ -name "*rootfs*img*" -delete
+      run: |
+        find openwrt/bin/targets/ -name "*rootfs*img*" -delete
+        find openwrt/bin/targets/ -name "*vmlinuz" -delete
 
     - name: Upload bin directory
       uses: actions/upload-artifact@master
