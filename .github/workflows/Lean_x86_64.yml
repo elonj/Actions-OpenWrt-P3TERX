@@ -32,9 +32,10 @@ env:
   CONFIG_FILE: 'x86_64.config'
   DIY_SH: 'diy.sh'
   FREE_UP_DISK: true
-  SSH_ACTIONS: false
+  SSH_ACTIONS: true
   UPLOAD_BIN_DIR: true
   UPLOAD_FIRMWARE: true
+  TZ: America/Los_Angeles
 
 jobs:
   build:
@@ -92,6 +93,8 @@ jobs:
       run: |
         [ -e files ] && mv files openwrt/files
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+        rm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm
+        mv nlbw/display.htm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm
         chmod +x $DIY_SH
         cd openwrt
         ../$DIY_SH
