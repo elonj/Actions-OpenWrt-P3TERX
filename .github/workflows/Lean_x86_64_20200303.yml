@@ -81,6 +81,7 @@ jobs:
         rm -rf OpenClash
         git clone https://github.com/Lienol/openwrt-package.git
         mv openwrt-package/lienol/luci-app-ssr-python-pro-server ./luci-app-ssr-python-pro-server
+        mv openwrt-package/lienol/luci-theme-bootstrap-mod ./luci-theme-bootstrap-mod
         rm -rf openwrt-package
 
     - name: Update feeds
