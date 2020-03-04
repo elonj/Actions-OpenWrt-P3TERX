@@ -12,9 +12,9 @@ on:
   release:
     types: [published]
 
-  #push:
-  #  branches:
-  #    - master
+  push:
+    branches:
+      - master
 
     paths:
       - 'x86_64.config'
@@ -81,6 +81,7 @@ jobs:
         rm -rf OpenClash
         git clone https://github.com/Lienol/openwrt-package.git
         mv openwrt-package/lienol/luci-app-ssr-python-pro-server ./luci-app-ssr-python-pro-server
+        mv openwrt-package/lienol/luci-theme-bootstrap-mod ./luci-theme-bootstrap-mod
         rm -rf openwrt-package
 
     - name: Update feeds
@@ -126,7 +127,9 @@ jobs:
         echo "::set-env name=VERSION::$version"
 
     - name: Reduce file size
-      run: find openwrt/bin/targets/ -name "*rootfs*img*" -delete
+      run: |
+        find openwrt/bin/targets/ -name "*rootfs*img*" -delete
+        find openwrt/bin/targets/ -name "*vmlinuz" -delete
 
     - name: Upload bin directory
       uses: actions/upload-artifact@master
