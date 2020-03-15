@@ -27,7 +27,7 @@ on:
 #    types: started
 
 env:
-  REPO_URL: https://github.com/coolsnowwolf/lede/tree/b9cc436ce088a3101e304d0eaea4553158435654
+  REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   CONFIG_FILE: 'x86_64.config'
   DIY_SH: 'diy.sh'
@@ -68,7 +68,10 @@ jobs:
         sudo -E apt-get -qq clean
 
     - name: Clone source code
-      run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
+      run: |
+        git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
+        cd openwrt
+        git checkout b9cc436ce088a3101e304d0eaea4553158435654
 
     - name: Clone custom source code
       run: |
