@@ -27,7 +27,7 @@ on:
 #    types: started
 
 env:
-  REPO_URL: https://github.com/coolsnowwolf/lede
+  REPO_URL: https://github.com/coolsnowwolf/lede/tree/b9cc436ce088a3101e304d0eaea4553158435654
   REPO_BRANCH: master
   CONFIG_FILE: 'x86_64.config'
   DIY_SH: 'diy.sh'
