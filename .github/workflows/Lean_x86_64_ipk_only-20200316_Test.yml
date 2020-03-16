@@ -12,9 +12,9 @@ on:
   release:
     types: [published]
 
-  #push:
-  #  branches:
-  #    - master
+  push:
+    branches:
+      - master
 
     paths:
       - 'x86_64.config'
@@ -68,10 +68,7 @@ jobs:
         sudo -E apt-get -qq clean
 
     - name: Clone source code
-      run: |
-        git clone -n https://github.com/coolsnowwolf/lede openwrt
-        cd openwrt
-        git checkout b9cc436ce088a3101e304d0eaea4553158435654
+      run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
 
     - name: Clone custom source code
       run: |
