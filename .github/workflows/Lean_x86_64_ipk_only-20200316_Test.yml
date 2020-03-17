@@ -107,23 +107,23 @@ jobs:
       uses: P3TERX/debugger-action@master
       if: env.SSH_ACTIONS == 'true'
 
-    - name: Download package
-      id: package
-      run: |
-        cd openwrt
-        make download -j8
-        find dl -size -1024c -exec ls -l {} \;
-        find dl -size -1024c -exec rm -f {} \;
+    # - name: Download package
+      # id: package
+      # run: |
+        # cd openwrt
+        # make download -j8
+        # find dl -size -1024c -exec ls -l {} \;
+        # find dl -size -1024c -exec rm -f {} \;
 
-    - name: Compile ipks
-      id: compile
-      run: |
-        cd openwrt
-        make package/coolapps/luci-app-adguardhome/compile v=99
-        make package/coolapps/luci-app-ssr-python-pro-server/compile v=99
-        make package/coolapps/luci-app-openclash/compile v=99
-        make package/coolapps/smartdns/compile v=99
-        make package/coolapps/luci-app-smartdns-compat/compile v=99
+    # - name: Compile ipks
+      # id: compile
+      # run: |
+        # cd openwrt
+        # make package/coolapps/luci-app-adguardhome/compile v=99
+        # make package/coolapps/luci-app-ssr-python-pro-server/compile v=99
+        # make package/coolapps/luci-app-openclash/compile v=99
+        # make package/coolapps/smartdns/compile v=99
+        # make package/coolapps/luci-app-smartdns-compat/compile v=99
 
     # - name: Compile the firmware
       # id: compile
