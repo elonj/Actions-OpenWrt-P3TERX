@@ -32,7 +32,7 @@ env:
   CONFIG_FILE: 'x86_64.config'
   DIY_SH: 'diy.sh'
   FREE_UP_DISK: true
-  SSH_ACTIONS: false
+  SSH_ACTIONS: true
   UPLOAD_BIN_DIR: true
   UPLOAD_FIRMWARE: true
   TZ: America/Los_Angeles
