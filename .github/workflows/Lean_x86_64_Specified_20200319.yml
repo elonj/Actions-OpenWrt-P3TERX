@@ -59,7 +59,6 @@ jobs:
       if: env.FREE_UP_DISK == 'true'
       env:
         DEBIAN_FRONTEND: noninteractive
-
       run: |
         sudo rm -rf /usr/share/dotnet
         docker rmi `docker images -q`
@@ -104,8 +103,8 @@ jobs:
         mv nlbw/display.htm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm
         rm openwrt/package/lean/luci-app-ssrserver-python/luasrc/model/cbi/ssrs.lua
         mv modfiles/luci-app-ssrserver-python/luasrc/model/cbi/ssrs.lua openwrt/package/lean/luci-app-ssrserver-python/luasrc/model/cbi/ssrs.lua
-        rm openwrt/package/openwrt-package/lienol/luci-app-ssr-libev-server/po/zh-cn/ssr_libev_server.po
-        mv modfiles/luci-app-ssr-python-pro-server/po/zh-cn/ssr_python_pro_server.po openwrt/package/openwrt-package/lienol/luci-app-ssr-libev-server/po/zh-cn/ssr_libev_server.po
+        rm openwrt/package/coolapps/luci-app-ssr-libev-server/po/zh-cn/ssr_libev_server.po
+        mv modfiles/luci-app-ssr-python-pro-server/po/zh-cn/ssr_python_pro_server.po openwrt/package/coolapps/luci-app-ssr-libev-server/po/zh-cn/ssr_libev_server.po
         chmod +x $DIY_SH
         cd openwrt
         ../$DIY_SH
