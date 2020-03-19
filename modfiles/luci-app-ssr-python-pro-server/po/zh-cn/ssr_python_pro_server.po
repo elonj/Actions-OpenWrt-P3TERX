@@ -1,7 +1,7 @@
-msgid "ShadowsocksR Python Server"
+msgid "ShadowsocksR Python Pro Server"
 msgstr "ShadowsocksR Python Pro 服务器"
 
-msgid "SSR Python Server"
+msgid "SSR Python Pro Server"
 msgstr "SSR Python Pro 服务器"
 
 msgid "Global Settings"
