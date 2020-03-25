@@ -12,9 +12,9 @@ on:
   release:
     types: [published]
 
-  #push:
-  #  branches:
-  #    - master
+  push:
+    branches:
+      - master
 
     paths:
       - 'x86_64.config'
@@ -98,6 +98,9 @@ jobs:
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
         rm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm
         mv nlbw/display.htm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm
+        rm openwrt/package/lean/luci-app-dockerman
+        git clone https://github.com/lisaac/luci-app-dockerman.git
+        mv luci-app-dockerman openwrt/package/lean/luci-app-dockerman
         chmod +x $DIY_SH
         cd openwrt
         ../$DIY_SH
