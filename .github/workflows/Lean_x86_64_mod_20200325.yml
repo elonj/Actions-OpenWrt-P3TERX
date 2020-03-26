@@ -32,7 +32,7 @@ env:
   CONFIG_FILE: 'x86_64.config'
   DIY_SH: 'diy.sh'
   FREE_UP_DISK: true
-  SSH_ACTIONS: true
+  SSH_ACTIONS: false
   UPLOAD_BIN_DIR: true
   UPLOAD_FIRMWARE: true
   TZ: America/Los_Angeles
@@ -91,20 +91,22 @@ jobs:
     - name: Install feeds
       run: cd openwrt && ./scripts/feeds install -a
 
-    - name: SSH connection to Actions
-      uses: P3TERX/debugger-action@master
-      if: env.SSH_ACTIONS == 'true'
-
     - name: Load custom configuration
       run: |
         [ -e files ] && mv files openwrt/files
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
         rm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm
         mv nlbw/display.htm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm
+        rm -rf openwrt/package/lean/luci-app-dockerman
+        mv luci-app-dockerman openwrt/package/lean/luci-app-dockerman
         chmod +x $DIY_SH
         cd openwrt
         ../$DIY_SH
         make defconfig
+
+    - name: SSH connection to Actions
+      uses: P3TERX/debugger-action@master
+      if: env.SSH_ACTIONS == 'true'
 
     - name: Download package
       id: package
