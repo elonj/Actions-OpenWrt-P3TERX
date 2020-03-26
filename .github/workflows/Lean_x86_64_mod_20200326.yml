@@ -72,6 +72,8 @@ jobs:
     - name: Clone custom source code
       run: |
         rm -rf openwrt/package/lean/luci-app-dockerman
+        rm -rf luci-app-dockerman
+        git clone https://github.com/KFERMercer/luci-app-dockerman.git
         mv luci-app-dockerman openwrt/package/lean/luci-app-dockerman
         cd openwrt/package
         mkdir coolapps
