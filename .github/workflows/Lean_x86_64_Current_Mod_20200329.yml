@@ -5,6 +5,10 @@
 # Author: P3TERX
 # Blog: https://p3terx.com
 #=================================================
+# Current Build Mod
+# Log: 
+#     1. Replaced luci-app-dockerman
+#     2. Change Kernel from 4.9 to 4.19 (20200329)
 
 name: Build Openwrt Lean x86_64
 
@@ -12,13 +16,13 @@ on:
   release:
     types: [published]
 
-  #push:
-  #  branches:
-  #    - master
+  push:
+    branches:
+      - master
 
     paths:
       - 'x86_64.config'
-      - 'diy.sh'
+      - 'diy_mod.sh'
 
    # 9:30 PM (21:30) UTC = 5:30 AM (5:30) Next Day GMT +08 
 #  schedule:
@@ -140,7 +144,7 @@ jobs:
       uses: actions/upload-artifact@master
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
-        name: Openwrt_${{ env.VERSION }}
+        name: Openwrt_mod_${{ env.VERSION }}
         path: openwrt/bin
 
     - name: Organize files
@@ -156,5 +160,5 @@ jobs:
       uses: actions/upload-artifact@master
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
-        name: Openwrt_firmware_${{ env.VERSION }}
+        name: Openwrt_mod_firmware_${{ env.VERSION }}
         path: ${{ env.FIRMWARE }}

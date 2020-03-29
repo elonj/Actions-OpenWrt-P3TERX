@@ -5,6 +5,9 @@
 # Author: P3TERX
 # Blog: https://p3terx.com
 #=================================================
+# Current Build
+# Log: 
+#     1. Replaced luci-app-dockerman
 
 name: Build Openwrt Lean x86_64
 
@@ -67,10 +70,7 @@ jobs:
         sudo -E apt-get -qq clean
 
     - name: Clone source code
-      run: |
-        git clone -n https://github.com/coolsnowwolf/lede openwrt
-        cd openwrt
-        git checkout 3e2a3c0a031f61f7769007b57218719e2a220cdb
+      run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
 
     - name: Clone custom source code
       run: |

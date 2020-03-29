@@ -1,6 +1,6 @@
 #!/bin/bash
 #=================================================
-# Description: DIY script - luodaoyi style
+# Description: DIY script
 # Lisence: MIT
 # Author: P3TERX
 # Blog: https://p3terx.com
@@ -15,9 +15,8 @@ sed -i 's/CST-8/PST8PDT,M3.2.0,M11.1.0/g' package/lean/default-settings/files/zz
 sed -i 's/Asia/America/g' package/lean/default-settings/files/zzz-default-settings
 sed -i 's/Shanghai/Los Angeles/g' package/lean/default-settings/files/zzz-default-settings
 
-# add package repo => https://github.com/Lienol/openwrt-package
-echo 'src-git lienol https://github.com/Lienol/openwrt-package' >> feeds.conf.default
+# Modify timezone (not sure useful or not)
+sed -i 's/UTC/PST8PDT,M3.2.0,M11.1.0/g' package/base-files/files/bin/config_generate
 
-# update feeds
-./scripts/feeds update -a
-./scripts/feeds install -a
+# 3. Choose Kernel 4.19
+sed -i 's/4.9/4.19/g' target/linux/x86/Makefile
