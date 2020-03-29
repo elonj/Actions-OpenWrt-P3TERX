@@ -5,6 +5,9 @@
 # Author: P3TERX
 # Blog: https://p3terx.com
 #=================================================
+# Current Build
+# Log: 
+#     1. Replaced luci-app-dockerman
 
 name: Build Openwrt Lean x86_64
 
