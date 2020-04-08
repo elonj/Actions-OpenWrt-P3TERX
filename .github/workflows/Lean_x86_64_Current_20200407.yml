@@ -8,7 +8,7 @@
 # Current Build
 # Log: 
 #     1. Replaced luci-app-dockerman
-#     2. Updated sudo apt-get install to match lean's
+#     2. Updated sudo apt-get install per https://github.com/github-xihe/Action-Openwrt/blob/master/.github/workflows/x64.yml
 
 name: Build Openwrt Lean x86_64
 
@@ -35,7 +35,6 @@ env:
   REPO_BRANCH: master
   CONFIG_FILE: 'x86_64.config'
   DIY_SH: 'diy.sh'
-  FREE_UP_DISK: true
   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: true
   UPLOAD_FIRMWARE: true
@@ -54,21 +53,12 @@ jobs:
         DEBIAN_FRONTEND: noninteractive
       run: |
         sudo swapoff /swapfile
-        sudo rm -rf /swapfile /etc/apt/sources.list.d/*
+        sudo rm -rf /swapfile /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
         sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3.5 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib antlr3 gperf
-        curl -fsSL https://raw.githubusercontent.com/P3TERX/dotfiles/master/.bashrc >> ~/.bashrc
-
-    - name: Free up disk space
-      if: env.FREE_UP_DISK == 'true'
-      env:
-        DEBIAN_FRONTEND: noninteractive
-      run: |
-        sudo rm -rf /usr/share/dotnet
-        docker rmi `docker images -q`
-        sudo -E apt-get -q purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* mysql* php*
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
+        curl -fsSL https://raw.githubusercontent.com/P3TERX/dotfiles/master/.bashrc >> ~/.bashrc
 
     - name: Clone source code
       run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
@@ -90,8 +80,8 @@ jobs:
         mv openwrt-package/lienol/luci-app-ssr-python-pro-server ./luci-app-ssr-python-pro-server
         mv openwrt-package/lienol/luci-theme-bootstrap-mod ./luci-theme-bootstrap-mod
         rm -rf openwrt-package
-        git clone https://github.com/ujincn/smartdns.git
-        git clone https://github.com/ujincn/luci-app-smartdns-compat.git
+        # git clone https://github.com/ujincn/smartdns.git
+        # git clone https://github.com/ujincn/luci-app-smartdns-compat.git
 
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
