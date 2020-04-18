@@ -9,6 +9,7 @@
 # Log: 
 #     1. Replaced luci-app-dockerman
 #     2. Updated sudo apt-get install
+#     3. Add luci-app-rclone
 
 name: Build Openwrt Lean x86_64
 
@@ -76,9 +77,12 @@ jobs:
     - name: Clone custom source code
       run: |
         rm -rf openwrt/package/lean/luci-app-dockerman
-        rm -rf luci-app-dockerman
         git clone https://github.com/KFERMercer/luci-app-dockerman.git
         mv luci-app-dockerman openwrt/package/lean/luci-app-dockerman
+        git clone https://github.com/ElonH/Rclone-OpenWrt.git
+        mv Rclone-OpenWrt/luci-app-rclone openwrt/package/lean/luci-app-rclone
+        mv Rclone-OpenWrt/rclone-webui-react openwrt/package/lean/rclone-webui-react
+        mv Rclone-OpenWrt/rclone openwrt/package/lean/rclone
         cd openwrt/package
         mkdir coolapps
         cd coolapps
@@ -90,8 +94,6 @@ jobs:
         mv openwrt-package/lienol/luci-app-ssr-python-pro-server ./luci-app-ssr-python-pro-server
         mv openwrt-package/lienol/luci-theme-bootstrap-mod ./luci-theme-bootstrap-mod
         rm -rf openwrt-package
-        git clone https://github.com/ujincn/smartdns.git
-        git clone https://github.com/ujincn/luci-app-smartdns-compat.git
 
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
