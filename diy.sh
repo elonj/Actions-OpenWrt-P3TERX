@@ -20,3 +20,6 @@ sed -i 's/UTC/PST8PDT,M3.2.0,M11.1.0/g' package/base-files/files/bin/config_gene
 
 # Modify timezone (not sure useful or not)
 #sed -i 's/UTC/PST8PDT,M3.2.0,M11.1.0/g' package/base-files/files/etc/init.d/system
+
+# Make luci-app-ssr-plus available
+sed -i 's/#src-git helloworld/src-git helloworld/g'feeds.conf.default
