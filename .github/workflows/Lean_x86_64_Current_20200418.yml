@@ -83,6 +83,8 @@ jobs:
         mv Rclone-OpenWrt/luci-app-rclone openwrt/package/lean/luci-app-rclone
         mv Rclone-OpenWrt/rclone-webui-react openwrt/package/lean/rclone-webui-react
         mv Rclone-OpenWrt/rclone openwrt/package/lean/rclone
+        git clone https://github.com/fw876/helloworld.git
+        mv helloworld/luci-app-ssr-plus openwrt/package/lean/luci-app-ssr-plus
         cd openwrt/package
         mkdir coolapps
         cd coolapps
