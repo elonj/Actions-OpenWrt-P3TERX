@@ -10,6 +10,8 @@
 #     1. Replaced luci-app-dockerman
 #     2. Updated sudo apt-get install
 #     3. Add luci-app-rclone
+#     4. luci-app-ssr-python-pro-server was changed to luci-app-ssr-mudb-server (2020.05.13)
+#     5. Rclone was added to Lean. Comment git clone Rclone here (2020.05.13)
 
 name: Build Openwrt Lean x86_64
 
@@ -79,10 +81,10 @@ jobs:
         rm -rf openwrt/package/lean/luci-app-dockerman
         git clone https://github.com/KFERMercer/luci-app-dockerman.git
         mv luci-app-dockerman openwrt/package/lean/luci-app-dockerman
-        git clone https://github.com/ElonH/Rclone-OpenWrt.git
-        mv Rclone-OpenWrt/luci-app-rclone openwrt/package/lean/luci-app-rclone
-        mv Rclone-OpenWrt/rclone-webui-react openwrt/package/lean/rclone-webui-react
-        mv Rclone-OpenWrt/rclone openwrt/package/lean/rclone
+        # git clone https://github.com/ElonH/Rclone-OpenWrt.git
+        # mv Rclone-OpenWrt/luci-app-rclone openwrt/package/lean/luci-app-rclone
+        # mv Rclone-OpenWrt/rclone-webui-react openwrt/package/lean/rclone-webui-react
+        # mv Rclone-OpenWrt/rclone openwrt/package/lean/rclone
         git clone https://github.com/fw876/helloworld.git
         mv helloworld/luci-app-ssr-plus openwrt/package/lean/luci-app-ssr-plus
         cd openwrt/package
@@ -93,7 +95,7 @@ jobs:
         mv OpenClash/luci-app-openclash ./luci-app-openclash
         rm -rf OpenClash
         git clone https://github.com/Lienol/openwrt-package.git
-        mv openwrt-package/lienol/luci-app-ssr-python-pro-server ./luci-app-ssr-python-pro-server
+        mv openwrt-package/lienol/luci-app-ssr-mudb-server ./luci-app-ssr-mudb-server
         mv openwrt-package/lienol/luci-theme-bootstrap-mod ./luci-theme-bootstrap-mod
         rm -rf openwrt-package
 
