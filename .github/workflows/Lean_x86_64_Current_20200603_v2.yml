@@ -37,7 +37,7 @@ env:
   REPO_BRANCH: master
   # FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: x86_64.config
-  DIY_SH: x86_64.config
+  DIY_SH: diy.sh
   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: true
   UPLOAD_FIRMWARE: true
