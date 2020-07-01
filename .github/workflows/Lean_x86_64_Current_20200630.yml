@@ -14,6 +14,7 @@
 #     5. Rclone was added to Lean. Comment git clone Rclone here (2020.05.13)
 #     6. Update luci-app-dockerman to luci-app-docker per Lean's change (2020.06.03)
 #     7. Update template to latest https://github.com/P3TERX/Actions-OpenWrt build-openwrt.yml (2020.06.03)
+#     8. Add code to delete uefi-gpt-squashfs.img from the package (2020.07.01)
 
 name: Build Openwrt Lean x86_64
 
@@ -148,6 +149,7 @@ jobs:
       run: |	
         find openwrt/bin/targets/ -name "*rootfs*img*" -delete	
         find openwrt/bin/targets/ -name "*vmlinuz" -delete
+        find openwrt/bin/targets/ -name "*uefi" -delete
 
     - name: Upload bin directory
       uses: actions/upload-artifact@master
