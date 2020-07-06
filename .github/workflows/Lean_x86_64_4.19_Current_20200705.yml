@@ -24,9 +24,9 @@ on:
   repository_dispatch:
   release:
     types: published
-#  push:
-#    branches:
-#      - master
+  push:
+    branches:
+      - master
     paths:
       - 'x86_64_4.19.config'
       - 'diy.sh'
@@ -61,7 +61,7 @@ jobs:
       run: |
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
-        sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3.5 python2.7 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib antlr3 gperf wget swig
+        sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3.5 python2.7 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib antlr3 gperf wget swig libreadline-dev ccache curl vim nano python python3 python-pip python3-pip python-ply python3-ply haveged lrzsz scons ecj fastjar mkisofs
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
         sudo timedatectl set-timezone "$TZ"
@@ -85,25 +85,10 @@ jobs:
     - name: Clone custom source code	
       run: |	
         rm -rf openwrt/package/lean/luci-app-docker
-        git clone https://github.com/KFERMercer/luci-app-dockerman.git	
-        mv luci-app-dockerman openwrt/package/lean/luci-app-dockerman	
-        # git clone https://github.com/ElonH/Rclone-OpenWrt.git	
-        # mv Rclone-OpenWrt/luci-app-rclone openwrt/package/lean/luci-app-rclone	
-        # mv Rclone-OpenWrt/rclone-webui-react openwrt/package/lean/rclone-webui-react	
-        # mv Rclone-OpenWrt/rclone openwrt/package/lean/rclone	
-        git clone https://github.com/fw876/helloworld.git	
-        mv helloworld/luci-app-ssr-plus openwrt/package/lean/luci-app-ssr-plus	
-        cd openwrt/package	
-        mkdir coolapps	
-        cd coolapps	
-        git clone https://github.com/rufengsuixing/luci-app-adguardhome.git	
-        git clone -b master https://github.com/vernesong/OpenClash.git	
-        mv OpenClash/luci-app-openclash ./luci-app-openclash	
-        rm -rf OpenClash	
-        git clone https://github.com/Lienol/openwrt-package.git	
-        mv openwrt-package/lienol/luci-app-ssr-mudb-server ./luci-app-ssr-mudb-server	
-        mv openwrt-package/lienol/luci-theme-bootstrap-mod ./luci-theme-bootstrap-mod	
-        rm -rf openwrt-package
+        git clone https://github.com/KFERMercer/luci-app-dockerman.git openwrt/package/lean/luci-app-dockerman
+        git clone https://github.com/fw876/helloworld.git openwrt/package/lean/luci-app-ssr-plus
+        git clone https://github.com/rufengsuixing/luci-app-adguardhome.git openwrt/package/lean/luci-app-adguardhome
+        git clone -b master https://github.com/vernesong/OpenClash.git openwrt/package/lean/OpenClash
 
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
