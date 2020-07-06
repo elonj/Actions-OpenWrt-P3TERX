@@ -15,7 +15,7 @@
 #     6. Update luci-app-dockerman to luci-app-docker per Lean's change (2020.06.03)
 #     7. Update template to latest https://github.com/P3TERX/Actions-OpenWrt build-openwrt.yml (2020.06.03)
 #     8. Add code to delete uefi-gpt-squashfs.img from the package (2020.07.01)
-#     9. Update environment install list per LEDE (2020.07.06)
+#     9. Update environment install list per LEDE, Simplify "Clone custom source code"(2020.07.06)
 
 name: Build Openwrt Lean x86_64
 
@@ -84,17 +84,10 @@ jobs:
     - name: Clone custom source code	
       run: |	
         rm -rf openwrt/package/lean/luci-app-docker
-        git clone https://github.com/KFERMercer/luci-app-dockerman.git	
-        mv luci-app-dockerman openwrt/package/lean/luci-app-dockerman	
-        git clone https://github.com/fw876/helloworld.git	
-        mv helloworld/luci-app-ssr-plus openwrt/package/lean/luci-app-ssr-plus	
-        cd openwrt/package	
-        mkdir coolapps	
-        cd coolapps	
-        git clone https://github.com/rufengsuixing/luci-app-adguardhome.git	
-        git clone -b master https://github.com/vernesong/OpenClash.git	
-        mv OpenClash/luci-app-openclash ./luci-app-openclash	
-        rm -rf OpenClash	
+        git clone https://github.com/KFERMercer/luci-app-dockerman.git openwrt/package/lean/luci-app-dockerman
+        git clone https://github.com/fw876/helloworld.git openwrt/package/lean/luci-app-ssr-plus
+        git clone https://github.com/rufengsuixing/luci-app-adguardhome.git openwrt/package/lean/luci-app-adguardhome
+        git clone -b master https://github.com/vernesong/OpenClash.git openwrt/package/lean/OpenClash
 
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
