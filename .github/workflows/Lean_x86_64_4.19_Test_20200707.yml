@@ -28,7 +28,7 @@ on:
       - master
     paths:
       - 'x86_64_4.19.config'
-      - 'diy.sh'
+      - 'diy_4.19.sh'
 #  schedule:
 #    - cron: 0 8 * * 5
 #  watch:
@@ -39,7 +39,7 @@ env:
   REPO_BRANCH: master
   # FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: x86_64_4.19.config
-  DIY_SH: diy.sh
+  DIY_SH: diy_4.19.sh
   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: true
   UPLOAD_FIRMWARE: true
