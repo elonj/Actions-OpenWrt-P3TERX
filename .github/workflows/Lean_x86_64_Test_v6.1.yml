@@ -23,9 +23,9 @@ on:
   repository_dispatch:
   release:
     types: published
-  push:
-    branches:
-      - master
+  #push:
+  #  branches:
+  #    - master
     paths:
       - 'x86_64_test_v6.1.config'
       - 'diy.sh'
