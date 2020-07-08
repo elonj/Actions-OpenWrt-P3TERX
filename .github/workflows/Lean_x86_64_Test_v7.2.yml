@@ -16,6 +16,7 @@
 #     7. Update template to latest https://github.com/P3TERX/Actions-OpenWrt build-openwrt.yml (2020.06.03)
 #     8. Add code to delete uefi-gpt-squashfs.img from the package (2020.07.01)
 #     9. Update environment install list per LEDE, Simplify "Clone custom source code"(2020.07.06)
+#     Adding luci-app-eqos, Replace nlbwmon file
 
 name: Build Openwrt Lean x86_64
 
@@ -27,7 +28,7 @@ on:
   #  branches:
   #    - master
     paths:
-      - 'x86_64_test_v6.2.config'
+      - 'x86_64_test_v7.2.config'
       - 'diy.sh'
 #  schedule:
 #    - cron: 0 8 * * 5
@@ -38,7 +39,7 @@ env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   # FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: x86_64_test_v6.2.config
+  CONFIG_FILE: x86_64_test_v7.2.config
   DIY_SH: diy.sh
   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: true
@@ -76,8 +77,8 @@ jobs:
         
     - name: Clone custom source code	
       run: |	
-        # rm -rf openwrt/package/lean/luci-app-docker
-        # git clone https://github.com/KFERMercer/luci-app-dockerman.git openwrt/package/lean/luci-app-dockerman
+        rm -rf openwrt/package/lean/luci-app-docker
+        git clone https://github.com/KFERMercer/luci-app-dockerman.git openwrt/package/lean/luci-app-dockerman
         git clone https://github.com/fw876/helloworld.git openwrt/package/lean/luci-app-ssr-plus
         git clone https://github.com/rufengsuixing/luci-app-adguardhome.git openwrt/package/lean/luci-app-adguardhome
         git clone -b master https://github.com/vernesong/OpenClash.git openwrt/package/lean/OpenClash
@@ -92,8 +93,8 @@ jobs:
       run: |
         #[ -e files ] && mv files openwrt/files
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
-        #rm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm	
-        #mv nlbw/display.htm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm	
+        rm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm	
+        mv nlbw/display.htm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm	
         chmod +x $DIY_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_SH
@@ -129,6 +130,7 @@ jobs:
         find openwrt/bin/targets/ -name "*rootfs*img*" -delete	
         find openwrt/bin/targets/ -name "*vmlinuz" -delete
         find openwrt/bin/targets/ -name "*uefi*img*" -delete
+        find openwrt/bin/targets/ -name "*efi*img*" -delete
 
     - name: Upload bin directory
       uses: actions/upload-artifact@master
