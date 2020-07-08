@@ -16,6 +16,7 @@
 #     7. Update template to latest https://github.com/P3TERX/Actions-OpenWrt build-openwrt.yml (2020.06.03)
 #     8. Add code to delete uefi-gpt-squashfs.img from the package (2020.07.01)
 #     9. Update environment install list per LEDE, Simplify "Clone custom source code"(2020.07.06)
+#     Test Docker
 
 name: Build Openwrt Lean x86_64
 
@@ -23,9 +24,9 @@ on:
   repository_dispatch:
   release:
     types: published
-  #push:
-  #  branches:
-  #    - master
+  push:
+    branches:
+      - master
     paths:
       - 'x86_64_test.config'
       - 'diy.sh'
@@ -76,8 +77,8 @@ jobs:
         
     - name: Clone custom source code	
       run: |	
-        # rm -rf openwrt/package/lean/luci-app-docker
-        # git clone https://github.com/KFERMercer/luci-app-dockerman.git openwrt/package/lean/luci-app-dockerman
+        rm -rf openwrt/package/lean/luci-app-docker
+        git clone https://github.com/KFERMercer/luci-app-dockerman.git openwrt/package/lean/luci-app-dockerman
         git clone https://github.com/fw876/helloworld.git openwrt/package/lean/luci-app-ssr-plus
         git clone https://github.com/rufengsuixing/luci-app-adguardhome.git openwrt/package/lean/luci-app-adguardhome
         git clone -b master https://github.com/vernesong/OpenClash.git openwrt/package/lean/OpenClash
