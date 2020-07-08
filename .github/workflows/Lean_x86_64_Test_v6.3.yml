@@ -23,11 +23,11 @@ on:
   repository_dispatch:
   release:
     types: published
-  #push:
-  #  branches:
-  #    - master
+  push:
+    branches:
+      - master
     paths:
-      - 'x86_64_test_v6.2.config'
+      - 'x86_64_test_v6.3.config'
       - 'diy.sh'
 #  schedule:
 #    - cron: 0 8 * * 5
@@ -38,7 +38,7 @@ env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   # FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: x86_64_test_v6.2.config
+  CONFIG_FILE: x86_64_test_v6.3.config
   DIY_SH: diy.sh
   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: true
