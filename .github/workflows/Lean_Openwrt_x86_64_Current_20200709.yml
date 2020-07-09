@@ -7,7 +7,7 @@
 #=================================================
 # Current Build
 # Log: 
-#     1. Use https://github.com/coolsnowwolf/openwrt
+#     1. Use https://github.com/coolsnowwolf/openwrt Stable Branch 4.19 Kernel
 
 name: Build Lean Openwrt x86_64
 
@@ -15,9 +15,9 @@ on:
   repository_dispatch:
   release:
     types: published
-  #push:
-  #  branches:
-  #    - master
+  push:
+    branches:
+      - master
     paths:
       - 'x86_64_openwrt.config'
       - 'diy.sh'
@@ -80,6 +80,12 @@ jobs:
         # git clone https://github.com/fw876/helloworld.git openwrt/package/lean/luci-app-ssr-plus
         git clone https://github.com/rufengsuixing/luci-app-adguardhome.git openwrt/package/lean/luci-app-adguardhome
         git clone -b master https://github.com/vernesong/OpenClash.git openwrt/package/lean/OpenClash
+        cd openwrt/package	
+        mkdir coolapps	
+        cd coolapps
+        git clone https://github.com/Lienol/openwrt-package.git	
+        mv openwrt-package/lienol/luci-app-ssr-mudb-server ./luci-app-ssr-mudb-server	
+        rm -rf openwrt-package
 
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
