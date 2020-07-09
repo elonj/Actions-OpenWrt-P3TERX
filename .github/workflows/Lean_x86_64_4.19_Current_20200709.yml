@@ -24,9 +24,9 @@ on:
   repository_dispatch:
   release:
     types: published
-  push:
-    branches:
-      - master
+  #push:
+  #  branches:
+  #    - master
     paths:
       - 'x86_64_4.19.config'
       - 'diy_4.19.sh'
