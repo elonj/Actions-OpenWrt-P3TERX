@@ -8,6 +8,7 @@
 # Current Build
 # Log: 
 #     1. Use https://github.com/coolsnowwolf/openwrt Stable Branch 4.19 Kernel
+#     2. Change branches from master to main
 
 name: Build Lean Openwrt x86_64
 
@@ -17,7 +18,7 @@ on:
     types: published
   push:
     branches:
-      - master
+      - main
     paths:
       - 'x86_64_openwrt.config'
       - 'diy.sh'
