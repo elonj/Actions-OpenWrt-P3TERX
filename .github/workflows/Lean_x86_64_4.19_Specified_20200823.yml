@@ -1,0 +1,170 @@
+#=================================================
+# https://github.com/P3TERX/Actions-OpenWrt
+# Description: Build OpenWrt using GitHub Actions
+# Lisence: MIT
+# Author: P3TERX
+# Blog: https://p3terx.com
+#=================================================
+# Current Build
+# Log: 
+#     1. Replaced luci-app-dockerman
+#     2. Updated sudo apt-get install
+#     3. Add luci-app-rclone
+#     4. luci-app-ssr-python-pro-server was changed to luci-app-ssr-mudb-server (2020.05.13)
+#     5. Rclone was added to Lean. Comment git clone Rclone here (2020.05.13)
+#     6. Update luci-app-dockerman to luci-app-docker per Lean's change (2020.06.03)
+#     7. Update template to latest https://github.com/P3TERX/Actions-OpenWrt build-openwrt.yml (2020.06.03)
+#     8. Add code to delete uefi-gpt-squashfs.img from the package (2020.07.01)
+#     9. Specify commit of lede
+
+name: Build Openwrt Lean x86_64
+
+on:
+  repository_dispatch:
+  release:
+    types: published
+  push:
+    branches:
+      - main
+    paths:
+      - 'x86_64_4.19.config'
+      - 'diy.sh'
+#  schedule:
+#    - cron: 0 8 * * 5
+#  watch:
+#    types: started
+
+env:
+  REPO_URL: https://github.com/coolsnowwolf/lede
+  REPO_BRANCH: master
+  # FEEDS_CONF: feeds.conf.default
+  CONFIG_FILE: x86_64_4.19.config
+  DIY_SH: diy.sh
+  SSH_ACTIONS: false
+  UPLOAD_BIN_DIR: true
+  UPLOAD_FIRMWARE: true
+  TZ: America/Los_Angeles
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - name: Initialization environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3.5 python2.7 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib antlr3 gperf wget swig
+        sudo -E apt-get -qq autoremove --purge
+        sudo -E apt-get -qq clean
+        sudo timedatectl set-timezone "$TZ"
+        sudo mkdir -p /workdir
+        sudo chown $USER:$GROUPS /workdir
+
+    - name: Clone source code
+      working-directory: /workdir
+      run: |
+        df -hT $PWD
+        git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
+        cd openwrt
+        git checkout 09d432ba314e799648d8012d2a4d2f23930ec5e5
+        cd ..
+        ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+
+    # - name: Load custom feeds
+      # run: |
+        # [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
+        # chmod +x $DIY_P1_SH
+        # cd openwrt
+        # $GITHUB_WORKSPACE/$DIY_P1_SH
+        
+    - name: Clone custom source code	
+      run: |	
+        rm -rf openwrt/package/lean/luci-app-docker
+        git clone https://github.com/KFERMercer/luci-app-dockerman.git openwrt/package/lean/luci-app-dockerman
+        git clone https://github.com/fw876/helloworld.git openwrt/package/lean/luci-app-ssr-plus
+        git clone https://github.com/rufengsuixing/luci-app-adguardhome.git openwrt/package/lean/luci-app-adguardhome
+        git clone -b master https://github.com/vernesong/OpenClash.git openwrt/package/lean/OpenClash
+        cd openwrt/package	
+        mkdir coolapps	
+        cd coolapps
+        git clone https://github.com/Lienol/openwrt-package.git	
+        mv openwrt-package/lienol/luci-app-ssr-mudb-server ./luci-app-ssr-mudb-server	
+        rm -rf openwrt-package
+
+    - name: Update feeds
+      run: cd openwrt && ./scripts/feeds update -a
+
+    - name: Install feeds
+      run: cd openwrt && ./scripts/feeds install -a
+
+    - name: Load custom configuration
+      run: |
+        # [ -e files ] && mv files openwrt/files
+        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+        rm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm	
+        mv nlbw/display.htm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm	
+        chmod +x $DIY_SH
+        cd openwrt
+        $GITHUB_WORKSPACE/$DIY_SH
+
+    - name: SSH connection to Actions
+      uses: P3TERX/debugger-action@master
+      if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
+
+    - name: Download package
+      id: package
+      run: |
+        cd openwrt
+        make defconfig
+        make download -j8
+        find dl -size -1024c -exec ls -l {} \;
+        find dl -size -1024c -exec rm -f {} \;
+
+    - name: Compile the firmware
+      id: compile
+      run: |
+        cd openwrt
+        echo -e "$(nproc) thread compile"
+        make -j$(nproc) || make -j1 || make -j1 V=s
+        echo "::set-output name=status::success"
+        echo "::set-env name=FILE_DATE::$(date +"%Y-%m-%d_%H-%M")"
+
+    - name: Check space usage
+      if: (!cancelled())
+      run: df -hT
+
+    - name: Reduce file size	
+      run: |	
+        find openwrt/bin/targets/ -name "*rootfs*img*" -delete	
+        find openwrt/bin/targets/ -name "*vmlinuz" -delete
+        find openwrt/bin/targets/ -name "*uefi*img*" -delete
+
+    - name: Upload bin directory
+      uses: actions/upload-artifact@master
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
+      with:
+        name: OpenWrt_x86_64_Specified_${{ env.FILE_DATE }}
+        path: openwrt/bin
+
+    - name: Organize files
+      id: organize
+      if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+      run: |
+        cd openwrt/bin/targets/*/*
+        rm -rf packages
+        echo "::set-env name=FIRMWARE::$PWD"
+        echo "::set-output name=status::success"
+
+    - name: Upload firmware directory
+      uses: actions/upload-artifact@master
+      if: steps.organize.outputs.status == 'success' && !cancelled()
+      with:
+        name: OpenWrt_x86_64_Specified_firmware_${{ env.FILE_DATE }}
+        path: ${{ env.FIRMWARE }}
