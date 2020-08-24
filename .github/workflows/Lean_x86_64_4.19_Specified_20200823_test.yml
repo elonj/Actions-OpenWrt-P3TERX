@@ -94,12 +94,12 @@ jobs:
         mv openwrt-package/lienol/luci-app-ssr-mudb-server ./luci-app-ssr-mudb-server	
         rm -rf openwrt-package
 
-    - name: Update feeds
-      run: cd openwrt && ./scripts/feeds update -a
-
     - name: SSH connection to Actions
       uses: P3TERX/debugger-action@master
       if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
+
+    - name: Update feeds
+      run: cd openwrt && ./scripts/feeds update -a
 
     - name: Install feeds
       run: cd openwrt && ./scripts/feeds install -a
