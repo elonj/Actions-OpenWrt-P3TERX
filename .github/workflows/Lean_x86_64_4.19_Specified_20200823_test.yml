@@ -23,9 +23,9 @@ on:
   repository_dispatch:
   release:
     types: published
-#   push:
-#     branches:
-#       - main
+  push:
+    branches:
+      - main
     paths:
       - 'x86_64_4.19.config'
       - 'diy.sh'
@@ -67,19 +67,11 @@ jobs:
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
 
-    - name: SSH connection to Actions
-      uses: P3TERX/debugger-action@master
-      if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
-
-    # - name: Clone source code
-    #   working-directory: /workdir
-    #   run: |
-    #     df -hT $PWD
-    #     git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
-    #     cd openwrt
-    #     git checkout 09d432ba314e799648d8012d2a4d2f23930ec5e5
-    #     cd ..
-    #     ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+    - name: Clone source code
+      run: |
+        git clone -n https://github.com/coolsnowwolf/lede openwrt
+        cd openwrt
+        git checkout 09d432ba314e799648d8012d2a4d2f23930ec5e5
 
     # - name: Load custom feeds
       # run: |
@@ -104,6 +96,10 @@ jobs:
 
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
+
+    - name: SSH connection to Actions
+      uses: P3TERX/debugger-action@master
+      if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
 
     - name: Install feeds
       run: cd openwrt && ./scripts/feeds install -a
