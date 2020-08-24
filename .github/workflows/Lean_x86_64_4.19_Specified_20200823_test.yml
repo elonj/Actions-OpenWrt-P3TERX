@@ -23,9 +23,9 @@ on:
   repository_dispatch:
   release:
     types: published
-#   push:
-#     branches:
-#       - main
+  push:
+    branches:
+      - main
     paths:
       - 'x86_64_4.19.config'
       - 'diy.sh'
@@ -71,7 +71,7 @@ jobs:
       run: |
         git clone -n https://github.com/coolsnowwolf/lede openwrt
         cd openwrt
-        git checkout 09d432ba314e799648d8012d2a4d2f23930ec5e5
+        git checkout d669a371b655565764f1f0d010976c65c444e1c9
 
     # - name: Load custom feeds
       # run: |
