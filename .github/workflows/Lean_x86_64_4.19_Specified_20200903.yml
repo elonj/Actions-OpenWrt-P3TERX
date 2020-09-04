@@ -16,7 +16,7 @@
 #     7. Update template to latest https://github.com/P3TERX/Actions-OpenWrt build-openwrt.yml (2020.06.03)
 #     8. Add code to delete uefi-gpt-squashfs.img from the package (2020.07.01)
 #     9. Specify commit of lede
-#     10. Use self forked lede and change kernel to 4.19 (2020.08.25)
+#     10. Use self forked lede (2020.09.03)
 
 name: Build Openwrt Lean x86_64
 
@@ -24,9 +24,9 @@ on:
   repository_dispatch:
   release:
     types: published
-#   push:
-#     branches:
-#       - main
+  push:
+    branches:
+      - main
     paths:
       - 'x86_64_4.19.config'
       - 'diy.sh'
@@ -148,7 +148,7 @@ jobs:
       uses: actions/upload-artifact@master
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
-        name: OpenWrt_x86_64_4.19_${{ env.FILE_DATE }}
+        name: OpenWrt_x86_64_Specified_${{ env.FILE_DATE }}
         path: openwrt/bin
 
     - name: Organize files
@@ -164,5 +164,5 @@ jobs:
       uses: actions/upload-artifact@master
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
-        name: OpenWrt_x86_64_4.19_firmware_${{ env.FILE_DATE }}
+        name: OpenWrt_x86_64_Specified_firmware_${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
