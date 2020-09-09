@@ -86,7 +86,7 @@ jobs:
       run: |	
         rm -rf openwrt/package/lean/luci-app-docker
         git clone https://github.com/KFERMercer/luci-app-dockerman.git openwrt/package/lean/luci-app-dockerman
-        git clone https://github.com/fw876/helloworld.git openwrt/package/lean/luci-app-ssr-plus
+        git clone https://github.com/elonj/helloworld.git openwrt/package/lean/luci-app-ssr-plus
         git clone https://github.com/rufengsuixing/luci-app-adguardhome.git openwrt/package/lean/luci-app-adguardhome
         git clone -b master https://github.com/vernesong/OpenClash.git openwrt/package/lean/OpenClash
         cd openwrt/package	
