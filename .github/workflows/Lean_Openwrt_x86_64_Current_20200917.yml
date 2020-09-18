@@ -18,7 +18,7 @@ on:
   release:
     types: published
   push:
-   branches:
+    branches:
      - main
     paths:
       - 'x86_64_openwrt.config'
