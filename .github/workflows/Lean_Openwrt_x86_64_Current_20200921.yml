@@ -9,7 +9,7 @@
 # Log: 
 #     1. Use https://github.com/coolsnowwolf/openwrt Stable Branch 4.19 Kernel
 #     2. Change branches from master to main
-#     3. Change helloworld to self maintain git (2020.09.17)
+#     3. Change helloworld to self maintain git by using lean-openwrt-feeds.conf.default (2020.09.21)
 
 name: Build Lean Openwrt x86_64
 
@@ -17,9 +17,9 @@ on:
   repository_dispatch:
   release:
     types: published
-#   push:
-#     branches:
-#      - main
+  push:
+    branches:
+     - main
     paths:
       - 'x86_64_openwrt.config'
       - 'diy.sh'
@@ -31,7 +31,7 @@ on:
 env:
   REPO_URL: https://github.com/coolsnowwolf/openwrt
   REPO_BRANCH: lede-17.01
-  # FEEDS_CONF: feeds.conf.default
+  FEEDS_CONF: lean-openwrt-feeds.conf.default
   CONFIG_FILE: x86_64_openwrt.config
   DIY_SH: diy.sh
 #   SSH_ACTIONS: false
@@ -68,12 +68,12 @@ jobs:
         git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
-    # - name: Load custom feeds
-      # run: |
-        # [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
-        # chmod +x $DIY_P1_SH
-        # cd openwrt
-        # $GITHUB_WORKSPACE/$DIY_P1_SH
+    - name: Load custom feeds
+      run: |
+        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
+        chmod +x $DIY_P1_SH
+        cd openwrt
+        $GITHUB_WORKSPACE/$DIY_P1_SH
         
     - name: Clone custom source code	
       run: |	
