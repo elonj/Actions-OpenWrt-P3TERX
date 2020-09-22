@@ -136,6 +136,7 @@ jobs:
         find openwrt/bin/targets/ -name "*rootfs*img*" -delete	
         find openwrt/bin/targets/ -name "*vmlinuz" -delete
         find openwrt/bin/targets/ -name "*uefi*img*" -delete
+        find openwrt/bin/targets/ -name "*uefi*vmdk*" -delete
 
     - name: Upload bin directory
       uses: actions/upload-artifact@master
