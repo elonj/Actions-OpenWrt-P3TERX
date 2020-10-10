@@ -7,21 +7,29 @@
 #=================================================
 # Current Build
 # Log: 
-#     1. Use https://github.com/coolsnowwolf/openwrt Stable Branch 4.19 Kernel
-#     2. Change branches from master to main
-#     3. Change helloworld to self maintain git by using lean-openwrt-feeds.conf.default (2020.09.21)
+#     1. Replaced luci-app-dockerman
+#     2. Updated sudo apt-get install
+#     3. Add luci-app-rclone
+#     4. luci-app-ssr-python-pro-server was changed to luci-app-ssr-mudb-server (2020.05.13)
+#     5. Rclone was added to Lean. Comment git clone Rclone here (2020.05.13)
+#     6. Update luci-app-dockerman to luci-app-docker per Lean's change (2020.06.03)
+#     7. Update template to latest https://github.com/P3TERX/Actions-OpenWrt build-openwrt.yml (2020.06.03)
+#     8. Add code to delete uefi-gpt-squashfs.img from the package (2020.07.01)
+#     9. Specify commit of lede
+#     10. Use self forked lede (2020.09.03)
+#     11. Build for VMware, ROOTFS-Partsize = 500 M (2020.10.10)
 
-name: Build Lean Openwrt x86_64
+name: Build Openwrt Lean x86_64
 
 on:
   repository_dispatch:
   release:
     types: published
-#   push:
-#     branches:
-#      - main
+  push:
+    branches:
+      - main
     paths:
-      - 'x86_64_openwrt.config'
+      - 'x86_64_4.19_VM.config'
       - 'diy.sh'
 #  schedule:
 #    - cron: 0 8 * * 5
@@ -29,10 +37,10 @@ on:
 #    types: started
 
 env:
-  REPO_URL: https://github.com/coolsnowwolf/openwrt
-  REPO_BRANCH: lede-17.01
-  FEEDS_CONF: lean-openwrt-feeds.conf.default
-  CONFIG_FILE: x86_64_openwrt.config
+  REPO_URL: https://github.com/elonj/lede
+  REPO_BRANCH: main
+  # FEEDS_CONF: feeds.conf.default
+  CONFIG_FILE: x86_64_4.19_VM.config
   DIY_SH: diy.sh
 #   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: true
@@ -54,7 +62,7 @@ jobs:
       run: |
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
-        sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3.5 python2.7 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib antlr3 gperf wget swig
+        sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-1804)
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
         sudo timedatectl set-timezone "$TZ"
@@ -68,9 +76,9 @@ jobs:
         git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
-    - name: Load custom feeds
-      run: |
-        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
+    # - name: Load custom feeds
+      # run: |
+        # [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
         # chmod +x $DIY_P1_SH
         # cd openwrt
         # $GITHUB_WORKSPACE/$DIY_P1_SH
@@ -79,7 +87,7 @@ jobs:
       run: |	
         rm -rf openwrt/package/lean/luci-app-docker
         git clone https://github.com/KFERMercer/luci-app-dockerman.git openwrt/package/lean/luci-app-dockerman
-        # git clone https://github.com/elonj/helloworld.git openwrt/package/lean/luci-app-ssr-plus
+        git clone https://github.com/elonj/helloworld.git openwrt/package/lean/luci-app-ssr-plus
         git clone https://github.com/rufengsuixing/luci-app-adguardhome.git openwrt/package/lean/luci-app-adguardhome
         git clone -b master https://github.com/vernesong/OpenClash.git openwrt/package/lean/OpenClash
         cd openwrt/package	
@@ -105,9 +113,9 @@ jobs:
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_SH
 
-#     - name: SSH connection to Actions
-#       uses: P3TERX/debugger-action@master
-#       if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
+    # - name: SSH connection to Actions
+    #   uses: P3TERX/debugger-action@master
+    #   if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
 
     - name: Download package
       id: package
@@ -142,7 +150,7 @@ jobs:
       uses: actions/upload-artifact@master
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
-        name: Lean_OpenWrt_x86_64_${{ env.FILE_DATE }}
+        name: OpenWrt_x86_64_Specified_VM_${{ env.FILE_DATE }}
         path: openwrt/bin
 
     - name: Organize files
@@ -158,5 +166,5 @@ jobs:
       uses: actions/upload-artifact@master
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
-        name: Lean_OpenWrt_x86_64_firmware_${{ env.FILE_DATE }}
+        name: OpenWrt_x86_64_Specified_VM_firmware_${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
