@@ -17,7 +17,7 @@
 #     8. Add code to delete uefi-gpt-squashfs.img from the package (2020.07.01)
 #     9. Specify commit of lede
 #     10. Use self forked lede (2020.09.03)
-#     11. Build for VMware, ROOTFS-Partsize = 500 M (2020.10.10)
+#     11. Comments SSH (2020.10.12)
 
 name: Build Openwrt Lean x86_64
 
@@ -25,11 +25,11 @@ on:
   repository_dispatch:
   release:
     types: published
-#  push:
-#    branches:
-#      - main
+  push:
+    branches:
+      - main
     paths:
-      - 'x86_64_4.19_VM.config'
+      - 'x86_64_4.19.config'
       - 'diy.sh'
 #  schedule:
 #    - cron: 0 8 * * 5
@@ -40,9 +40,9 @@ env:
   REPO_URL: https://github.com/elonj/lede
   REPO_BRANCH: main
   # FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: x86_64_4.19_VM.config
+  CONFIG_FILE: x86_64_4.19.config
   DIY_SH: diy.sh
-#   SSH_ACTIONS: false
+  # SSH_ACTIONS: false
   UPLOAD_BIN_DIR: true
   UPLOAD_FIRMWARE: true
   TZ: America/Los_Angeles
@@ -114,8 +114,8 @@ jobs:
         $GITHUB_WORKSPACE/$DIY_SH
 
     # - name: SSH connection to Actions
-    #   uses: P3TERX/debugger-action@master
-    #   if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
+      # uses: P3TERX/debugger-action@master
+      # if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
 
     - name: Download package
       id: package
@@ -144,13 +144,12 @@ jobs:
         find openwrt/bin/targets/ -name "*rootfs*img*" -delete	
         find openwrt/bin/targets/ -name "*vmlinuz" -delete
         find openwrt/bin/targets/ -name "*uefi*img*" -delete
-        find openwrt/bin/targets/ -name "*uefi*vmdk*" -delete
 
     - name: Upload bin directory
       uses: actions/upload-artifact@master
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
-        name: OpenWrt_x86_64_Specified_VM_${{ env.FILE_DATE }}
+        name: OpenWrt_x86_64_Specified_${{ env.FILE_DATE }}
         path: openwrt/bin
 
     - name: Organize files
@@ -166,5 +165,5 @@ jobs:
       uses: actions/upload-artifact@master
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
-        name: OpenWrt_x86_64_Specified_VM_firmware_${{ env.FILE_DATE }}
+        name: OpenWrt_x86_64_Specified_firmware_${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
