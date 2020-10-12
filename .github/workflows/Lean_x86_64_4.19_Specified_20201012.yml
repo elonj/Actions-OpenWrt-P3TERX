@@ -18,6 +18,7 @@
 #     9. Specify commit of lede
 #     10. Use self forked lede (2020.09.03)
 #     11. Comments SSH (2020.10.12)
+#     12. Updated "Update feeds" for libcap and libcap-bin for openclash (2020.10.12)
 
 name: Build Openwrt Lean x86_64
 
@@ -98,7 +99,10 @@ jobs:
         rm -rf openwrt-package
 
     - name: Update feeds
-      run: cd openwrt && ./scripts/feeds update -a
+      run: |
+        cd openwrt && ./scripts/feeds update -a
+        rm -rf feeds/packages/libs/libcap
+        svn co https://github.com/openwrt/packages/trunk/libs/libcap feeds/packages/libs/libcap
 
     - name: Install feeds
       run: cd openwrt && ./scripts/feeds install -a
