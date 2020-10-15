@@ -11,6 +11,7 @@
 #     2. Change branches from master to main
 #     3. Change helloworld to self maintain git by using lean-openwrt-feeds.conf.default (2020.09.21)
 #     4. Disable lean-openwrt-feeds.conf.default to use latest helloworld (2020.10.15)
+#     5. Change diy.sh to diy_openwrt.sh (2020.10.15)
 
 name: Build Lean Openwrt x86_64
 
@@ -23,7 +24,7 @@ on:
       - main
     paths:
       - 'x86_64_openwrt.config'
-      - 'diy.sh'
+      - 'diy_openwrt.sh'
 #  schedule:
 #    - cron: 0 8 * * 5
 #  watch:
@@ -34,7 +35,7 @@ env:
   REPO_BRANCH: lede-17.01
 #   FEEDS_CONF: lean-openwrt-feeds.conf.default
   CONFIG_FILE: x86_64_openwrt.config
-  DIY_SH: diy.sh
+  DIY_SH: diy_openwrt.sh
 #   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: true
   UPLOAD_FIRMWARE: true
