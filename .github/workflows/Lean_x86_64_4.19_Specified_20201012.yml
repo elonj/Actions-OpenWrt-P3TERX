@@ -17,7 +17,7 @@
 #     8. Add code to delete uefi-gpt-squashfs.img from the package (2020.07.01)
 #     9. Specify commit of lede
 #     10. Use self forked lede (2020.09.03)
-#     11. Build for VMware, ROOTFS-Partsize = 500 M (2020.10.10)
+#     11. Comments SSH (2020.10.12)
 
 name: Build Openwrt Lean x86_64
 
@@ -29,7 +29,7 @@ on:
 #     branches:
 #       - main
     paths:
-      - 'x86_64_4.19_VM.config'
+      - 'x86_64_4.19.config'
       - 'diy.sh'
 #  schedule:
 #    - cron: 0 8 * * 5
@@ -40,9 +40,9 @@ env:
   REPO_URL: https://github.com/elonj/lede
   REPO_BRANCH: main
   # FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: x86_64_4.19_VM.config
+  CONFIG_FILE: x86_64_4.19.config
   DIY_SH: diy.sh
-#   SSH_ACTIONS: false
+  # SSH_ACTIONS: false
   UPLOAD_BIN_DIR: true
   UPLOAD_FIRMWARE: true
   TZ: America/Los_Angeles
@@ -68,14 +68,12 @@ jobs:
         sudo timedatectl set-timezone "$TZ"
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
-
     - name: Clone source code
       working-directory: /workdir
       run: |
         df -hT $PWD
         git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
-
     # - name: Load custom feeds
       # run: |
         # [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
@@ -96,7 +94,6 @@ jobs:
         git clone https://github.com/Lienol/openwrt-package.git	
         mv openwrt-package/lienol/luci-app-ssr-mudb-server ./luci-app-ssr-mudb-server	
         rm -rf openwrt-package
-
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
 
@@ -112,10 +109,9 @@ jobs:
         chmod +x $DIY_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_SH
-
     # - name: SSH connection to Actions
-    #   uses: P3TERX/debugger-action@master
-    #   if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
+      # uses: P3TERX/debugger-action@master
+      # if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
 
     - name: Download package
       id: package
@@ -125,7 +121,6 @@ jobs:
         make download -j8
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
-
     - name: Compile the firmware
       id: compile
       run: |
@@ -134,7 +129,6 @@ jobs:
         make -j$(nproc) || make -j1 || make -j1 V=s
         echo "::set-output name=status::success"
         echo "::set-env name=FILE_DATE::$(date +"%Y-%m-%d_%H-%M")"
-
     - name: Check space usage
       if: (!cancelled())
       run: df -hT
@@ -144,13 +138,11 @@ jobs:
         find openwrt/bin/targets/ -name "*rootfs*img*" -delete	
         find openwrt/bin/targets/ -name "*vmlinuz" -delete
         find openwrt/bin/targets/ -name "*uefi*img*" -delete
-        find openwrt/bin/targets/ -name "*uefi*vmdk*" -delete
-
     - name: Upload bin directory
       uses: actions/upload-artifact@master
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
-        name: OpenWrt_x86_64_Specified_VM_${{ env.FILE_DATE }}
+        name: OpenWrt_x86_64_Specified_${{ env.FILE_DATE }}
         path: openwrt/bin
 
     - name: Organize files
@@ -161,10 +153,9 @@ jobs:
         rm -rf packages
         echo "::set-env name=FIRMWARE::$PWD"
         echo "::set-output name=status::success"
-
     - name: Upload firmware directory
       uses: actions/upload-artifact@master
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
-        name: OpenWrt_x86_64_Specified_VM_firmware_${{ env.FILE_DATE }}
+        name: OpenWrt_x86_64_Specified_firmware_${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
