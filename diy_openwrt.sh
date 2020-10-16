@@ -22,4 +22,4 @@ sed -i 's/UTC/PST8PDT,M3.2.0,M11.1.0/g' package/base-files/files/bin/config_gene
 #sed -i 's/UTC/PST8PDT,M3.2.0,M11.1.0/g' package/base-files/files/etc/init.d/system
 
 # luci-app-flowoffload: remove kernel limite
-sed 's/@LINUX_5_4//' package/lean/luci-app-flowoffload/Makefile
+sed -i 's/@LINUX_5_4/@!LINUX_4_9/g' package/lean/luci-app-flowoffload/Makefile
