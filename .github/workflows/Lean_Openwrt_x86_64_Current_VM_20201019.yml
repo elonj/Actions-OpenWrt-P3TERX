@@ -12,6 +12,7 @@
 #     3. Change helloworld to self maintain git by using lean-openwrt-feeds.conf.default (2020.09.21)
 #     4. Disable lean-openwrt-feeds.conf.default to use latest helloworld (2020.10.15)
 #     5. Change diy.sh to diy_openwrt.sh (2020.10.15)
+#     6. Use x86_64_openwrt_VM.config for VM version (Roofs Partsize = 500 MB) (2020.10.19)
 
 name: Build Lean Openwrt x86_64
 
@@ -19,11 +20,11 @@ on:
   repository_dispatch:
   release:
     types: published
-#   push:
-#     branches:
-#       - main
+  push:
+    branches:
+      - main
     paths:
-      - 'x86_64_openwrt.config'
+      - 'x86_64_openwrt_VM.config'
       - 'diy_openwrt.sh'
 #  schedule:
 #    - cron: 0 8 * * 5
@@ -34,7 +35,7 @@ env:
   REPO_URL: https://github.com/coolsnowwolf/openwrt
   REPO_BRANCH: lede-17.01
 #   FEEDS_CONF: lean-openwrt-feeds.conf.default
-  CONFIG_FILE: x86_64_openwrt.config
+  CONFIG_FILE: x86_64_openwrt_VM.config
   DIY_SH: diy_openwrt.sh
 #   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: true
@@ -144,7 +145,7 @@ jobs:
       uses: actions/upload-artifact@master
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
-        name: Lean_OpenWrt_x86_64_${{ env.FILE_DATE }}
+        name: Lean_OpenWrt_x86_64_VM_${{ env.FILE_DATE }}
         path: openwrt/bin
 
     - name: Organize files
@@ -160,5 +161,5 @@ jobs:
       uses: actions/upload-artifact@master
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
-        name: Lean_OpenWrt_x86_64_firmware_${{ env.FILE_DATE }}
+        name: Lean_OpenWrt_x86_64_firmware_VM_${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
