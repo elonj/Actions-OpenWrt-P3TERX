@@ -27,7 +27,7 @@ on:
     types: published
   push:
     branches:
-      - master
+      - main
     paths:
       - 'x86_64.config'
       - 'diy.sh'
