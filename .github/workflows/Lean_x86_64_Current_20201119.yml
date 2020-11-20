@@ -18,6 +18,7 @@
 #     9. Update environment install list per LEDE, Simplify "Clone custom source code"(2020.07.06)
 #     10. Kernel 5.4 per upstream default (2020.07.09)
 #     11. Update this action code (2020.10.20)
+#     12. Update to change set-env to echo "" >> $GITHUB_ENV (2020.11.19)
 
 name: Build Openwrt Lean x86_64
 
@@ -133,7 +134,7 @@ jobs:
         echo -e "$(nproc) thread compile"
         make -j$(nproc) || make -j1 || make -j1 V=s
         echo "::set-output name=status::success"
-        echo "::set-env name=FILE_DATE::$(date +"%Y-%m-%d_%H-%M")"
+        echo "FILE_DATE=$(date +"%Y-%m-%d_%H-%M")" >> $GITHUB_ENV
 
     - name: Check space usage
       if: (!cancelled())
@@ -161,7 +162,7 @@ jobs:
       run: |
         cd openwrt/bin/targets/*/*
         rm -rf packages
-        echo "::set-env name=FIRMWARE::$PWD"
+        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "::set-output name=status::success"
 
     - name: Upload firmware directory
