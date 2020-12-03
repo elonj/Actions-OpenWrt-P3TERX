@@ -95,7 +95,7 @@ jobs:
         mkdir coolapps	
         cd coolapps
         git clone https://github.com/Lienol/openwrt-package.git	
-        mv openwrt-package/lienol/luci-app-ssr-mudb-server ./luci-app-ssr-mudb-server	
+        mv openwrt-package/luci-app-ssr-mudb-server ./luci-app-ssr-mudb-server	
         rm -rf openwrt-package
 
     - name: Update feeds
