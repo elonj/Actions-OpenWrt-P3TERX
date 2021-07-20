@@ -26,9 +26,9 @@ on:
   repository_dispatch:
   release:
     types: published
-#   push:
-#     branches:
-#       - main
+  push:
+    branches:
+      - main
     paths:
       - 'x86_64.config'
       - 'diy.sh'
@@ -144,10 +144,10 @@ jobs:
       run: |	
         find openwrt/bin/targets/ -name "*rootfs*img*" -delete	
         find openwrt/bin/targets/ -name "*vmlinuz" -delete
-        find openwrt/bin/targets/ -name "*uefi*img*" -delete
-        find openwrt/bin/targets/ -name "*efi*img*" -delete
         find openwrt/bin/targets/ -name "*uefi*vmdk*" -delete
         find openwrt/bin/targets/ -name "*efi*vmdk*" -delete
+#        find openwrt/bin/targets/ -name "*uefi*img*" -delete
+#        find openwrt/bin/targets/ -name "*efi*img*" -delete
 
     - name: Upload bin directory
       uses: actions/upload-artifact@master
