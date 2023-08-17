@@ -80,11 +80,11 @@ jobs:
     needs: initialize
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@master
+    # - name: Checkout
+    #  uses: actions/checkout@master
 
     - name: Clone source code
-      # working-directory: /workdir
+      working-directory: /workdir
       # if: steps.initialize.outcome == 'success'
       run: |
         df -hT $PWD
@@ -104,12 +104,12 @@ jobs:
         git clone https://github.com/fw876/helloworld.git openwrt/package/lean/luci-app-ssr-plus
         git clone https://github.com/rufengsuixing/luci-app-adguardhome.git openwrt/package/lean/luci-app-adguardhome
         git clone -b master https://github.com/vernesong/OpenClash.git openwrt/package/lean/OpenClash
-        cd openwrt/package
-        mkdir coolapps
-        cd coolapps
-        git clone https://github.com/Lienol/openwrt-package.git
-        mv openwrt-package/luci-app-ssr-mudb-server ./luci-app-ssr-mudb-server
-        rm -rf openwrt-package
+        # cd openwrt/package
+        # mkdir coolapps
+        # cd coolapps
+        # git clone https://github.com/Lienol/openwrt-package.git
+        # mv openwrt-package/luci-app-ssr-mudb-server ./luci-app-ssr-mudb-server
+        # rm -rf openwrt-package
 
   update_and_install:
     runs-on: ubuntu-22.04
