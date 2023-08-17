@@ -84,7 +84,7 @@ jobs:
       uses: actions/checkout@master
 
     - name: Clone source code
-      working-directory: /workdir
+      # working-directory: /workdir
       # if: steps.initialize.outcome == 'success'
       run: |
         df -hT $PWD
