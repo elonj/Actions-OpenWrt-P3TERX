@@ -125,6 +125,8 @@ jobs:
         df -h
         echo "======================="
         git clone -b master https://github.com/vernesong/OpenClash.git openwrt/package/lean/OpenClash
+        mv openwrt/package/lean/OpenClash/luci-app-openclash openwrt/package/lean/luci-app-openclash
+        rm -rf openwrt/package/lean/OpenClash
         echo "======================="
         echo "Space usage:"
         echo "======================="
