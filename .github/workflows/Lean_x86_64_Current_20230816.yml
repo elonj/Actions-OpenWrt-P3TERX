@@ -1,0 +1,216 @@
+#=================================================
+# https://github.com/P3TERX/Actions-OpenWrt
+# Description: Build OpenWrt using GitHub Actions
+# Lisence: MIT
+# Author: P3TERX
+# Blog: https://p3terx.com
+#=================================================
+# Current Build
+# Log: 
+#     1. Replaced luci-app-dockerman
+#     2. Updated sudo apt-get install
+#     3. Add luci-app-rclone
+#     4. luci-app-ssr-python-pro-server was changed to luci-app-ssr-mudb-server (2020.05.13)
+#     5. Rclone was added to Lean. Comment git clone Rclone here (2020.05.13)
+#     6. Update luci-app-dockerman to luci-app-docker per Lean's change (2020.06.03)
+#     7. Update template to latest https://github.com/P3TERX/Actions-OpenWrt build-openwrt.yml (2020.06.03)
+#     8. Add code to delete uefi-gpt-squashfs.img from the package (2020.07.01)
+#     9. Update environment install list per LEDE, Simplify "Clone custom source code"(2020.07.06)
+#     10. Kernel 5.4 per upstream default (2020.07.09)
+#     11. Update this action code (2020.10.20)
+#     12. Update to change set-env to echo "" >> $GITHUB_ENV (2020.11.19)
+#     13. Update "Initialization environment" (2023.05.09)
+#     14. Update with help from ChatGPT (2023.08.16)
+
+name: Build Openwrt Lean x86_64
+
+on:
+  repository_dispatch:
+  release:
+    types: published
+  push:
+    branches:
+      - main
+    paths:
+      - 'x86_64.config'
+      - 'diy.sh'
+#  schedule:
+#    - cron: 0 8 * * 5
+#  watch:
+#    types: started
+
+env:
+  REPO_URL: https://github.com/coolsnowwolf/lede
+  REPO_BRANCH: master
+  # FEEDS_CONF: feeds.conf.default
+  CONFIG_FILE: x86_64.config
+  DIY_SH: diy.sh
+  # SSH_ACTIONS: false
+  UPLOAD_BIN_DIR: true
+  UPLOAD_FIRMWARE: true
+  TZ: America/Los_Angeles
+
+jobs:
+  initialize:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - name: Initialization environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        docker rmi `docker images -q`
+        sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android
+        sudo -E apt-mark hold grub-efi-amd64-signed
+        sudo -E apt update
+        sudo -E apt -y purge azure-cli* docker* ghc* zulu* llvm* firefox google* dotnet* powershell* openjdk* mysql* php* mongodb* dotnet* moby* snap*
+        sudo -E apt -y full-upgrade
+        sudo -E apt -y install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libreadline-dev libssl-dev libtool lrzsz mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pyelftools libpython3-dev qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
+        sudo -E apt -y autoremove --purge
+        sudo -E apt clean
+        sudo timedatectl set-timezone "$TZ"
+        sudo mkdir -p /workdir
+        sudo chown $USER:$GROUPS /workdir
+
+  clone_source_code:
+    runs-on: ubuntu-22.04
+    needs: initialize
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - name: Clone source code
+      working-directory: /workdir
+      if: steps.initialize.outcome == 'success'
+      run: |
+        df -hT $PWD
+        git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
+        ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+
+  clone_custom_code:
+    runs-on: ubuntu-22.04
+    needs: clone_source_code
+
+    steps:
+    - name: Clone custom source code
+      if: steps.clone_source_code.outcome == 'success'
+      run: |
+        rm -rf openwrt/package/lean/luci-app-docker
+        # git clone https://github.com/KFERMercer/luci-app-dockerman.git openwrt/package/lean/luci-app-dockerman
+        git clone https://github.com/fw876/helloworld.git openwrt/package/lean/luci-app-ssr-plus
+        git clone https://github.com/rufengsuixing/luci-app-adguardhome.git openwrt/package/lean/luci-app-adguardhome
+        git clone -b master https://github.com/vernesong/OpenClash.git openwrt/package/lean/OpenClash
+        cd openwrt/package
+        mkdir coolapps
+        cd coolapps
+        git clone https://github.com/Lienol/openwrt-package.git
+        mv openwrt-package/luci-app-ssr-mudb-server ./luci-app-ssr-mudb-server
+        rm -rf openwrt-package
+
+  update_and_install:
+    runs-on: ubuntu-22.04
+    needs: clone_custom_code
+
+    steps:
+    - name: Update feeds
+      if: steps.clone_custom_code.outcome == 'success'
+      run: cd openwrt && ./scripts/feeds update -a
+
+    - name: Install feeds
+      if: steps.update_and_install.outcome == 'success'
+      run: cd openwrt && ./scripts/feeds install -a
+
+  load_custom_config:
+    runs-on: ubuntu-22.04
+    needs: update_and_install
+
+    steps:
+    - name: Load custom configuration
+      if: steps.update_and_install.outcome == 'success'
+      run: |
+        #[ -e files ] && mv files openwrt/files
+        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+        rm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm
+        mv nlbw/display.htm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm
+        chmod +x $DIY_SH
+        cd openwrt
+        $GITHUB_WORKSPACE/$DIY_SH
+
+  download_and_compile:
+    runs-on: ubuntu-22.04
+    needs: load_custom_config
+
+    steps:
+    - name: Download package
+      if: steps.load_custom_config.outcome == 'success'
+      run: |
+        cd openwrt
+        make defconfig
+        make download -j8
+        find dl -size -1024c -exec ls -l {} \;
+        find dl -size -1024c -exec rm -f {} \;
+
+    - name: Compile the firmware
+      if: steps.download_and_compile.outcome == 'success'
+      run: |
+        cd openwrt
+        echo -e "$(nproc) thread compile"
+        make -j$(nproc) || make -j1 || make -j1 V=s
+        echo "status=success" >> $GITHUB_OUTPUT
+        echo "FILE_DATE=$(date +"%Y-%m-%d_%H-%M")" >> $GITHUB_ENV
+
+  reduce_file_size:
+    runs-on: ubuntu-22.04
+    needs: download_and_compile
+
+    steps:
+    - name: Reduce file size
+      if: steps.download_and_compile.outcome == 'success'
+      run: |
+        find openwrt/bin/targets/ -name "*rootfs*img*" -delete
+        find openwrt/bin/targets/ -name "*vmlinuz" -delete
+        find openwrt/bin/targets/ -name "*uefi*vmdk*" -delete
+        find openwrt/bin/targets/ -name "*efi*vmdk*" -delete
+        find openwrt/bin/targets/ -name "*uefi*img*" -delete
+        find openwrt/bin/targets/ -name "*efi*img*" -delete
+
+  upload_bin_directory:
+    runs-on: ubuntu-22.04
+    needs: reduce_file_size
+
+    steps:
+    - name: Upload bin directory
+      if: steps.reduce_file_size.outcome == 'success' && env.UPLOAD_BIN_DIR == 'true'
+      uses: actions/upload-artifact@master
+      with:
+        name: OpenWrt_x86_64_VM_${{ env.FILE_DATE }}
+        path: openwrt/bin
+
+  organize_files:
+    runs-on: ubuntu-22.04
+    needs: upload_bin_directory
+
+    steps:
+    - name: Organize files
+      if: steps.upload_bin_directory.outcome == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+      run: |
+        cd openwrt/bin/targets/*/*
+        rm -rf packages
+        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+        echo "status=success" >> $GITHUB_OUTPUT
+
+  upload_firmware_directory:
+    runs-on: ubuntu-22.04
+    needs: organize_files
+
+    steps:
+    - name: Upload firmware directory
+      if: steps.organize_files.outcome == 'success' && !cancelled()
+      uses: actions/upload-artifact@master
+      with:
+        name: OpenWrt_x86_64_firmware_VM_${{ env.FILE_DATE }}
+        path: ${{ env.FIRMWARE }}
