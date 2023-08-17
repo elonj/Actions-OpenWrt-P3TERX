@@ -85,7 +85,7 @@ jobs:
 
     - name: Clone source code
       working-directory: /workdir
-      if: steps.initialize.outcome == 'success'
+      # if: steps.initialize.outcome == 'success'
       run: |
         df -hT $PWD
         git clone --depth 1 https://github.com/coolsnowwolf/lede -b master openwrt
@@ -97,7 +97,7 @@ jobs:
 
     steps:
     - name: Clone custom source code
-      if: steps.clone_source_code.outcome == 'success'
+      # if: steps.clone_source_code.outcome == 'success'
       run: |
         rm -rf openwrt/package/lean/luci-app-docker
         # git clone https://github.com/KFERMercer/luci-app-dockerman.git openwrt/package/lean/luci-app-dockerman
@@ -117,11 +117,11 @@ jobs:
 
     steps:
     - name: Update feeds
-      if: steps.clone_custom_code.outcome == 'success'
+      # if: steps.clone_custom_code.outcome == 'success'
       run: cd openwrt && ./scripts/feeds update -a
 
     - name: Install feeds
-      if: steps.update_and_install.outcome == 'success'
+      # if: steps.update_and_install.outcome == 'success'
       run: cd openwrt && ./scripts/feeds install -a
 
   load_custom_config:
@@ -130,7 +130,7 @@ jobs:
 
     steps:
     - name: Load custom configuration
-      if: steps.update_and_install.outcome == 'success'
+      # if: steps.update_and_install.outcome == 'success'
       run: |
         #[ -e files ] && mv files openwrt/files
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
@@ -146,7 +146,7 @@ jobs:
 
     steps:
     - name: Download package
-      if: steps.load_custom_config.outcome == 'success'
+      # if: steps.load_custom_config.outcome == 'success'
       run: |
         cd openwrt
         make defconfig
@@ -155,7 +155,7 @@ jobs:
         find dl -size -1024c -exec rm -f {} \;
 
     - name: Compile the firmware
-      if: steps.download_and_compile.outcome == 'success'
+      # if: steps.download_and_compile.outcome == 'success'
       run: |
         cd openwrt
         echo -e "$(nproc) thread compile"
@@ -169,7 +169,7 @@ jobs:
 
     steps:
     - name: Reduce file size
-      if: steps.download_and_compile.outcome == 'success'
+      # if: steps.download_and_compile.outcome == 'success'
       run: |
         find openwrt/bin/targets/ -name "*rootfs*img*" -delete
         find openwrt/bin/targets/ -name "*vmlinuz" -delete
@@ -184,7 +184,7 @@ jobs:
 
     steps:
     - name: Upload bin directory
-      if: steps.reduce_file_size.outcome == 'success' && env.UPLOAD_BIN_DIR == 'true'
+      # if: steps.reduce_file_size.outcome == 'success' && env.UPLOAD_BIN_DIR == 'true'
       uses: actions/upload-artifact@master
       with:
         name: OpenWrt_x86_64_VM_${{ env.FILE_DATE }}
@@ -196,7 +196,7 @@ jobs:
 
     steps:
     - name: Organize files
-      if: steps.upload_bin_directory.outcome == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+      # if: steps.upload_bin_directory.outcome == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
         cd openwrt/bin/targets/*/*
         rm -rf packages
@@ -209,7 +209,7 @@ jobs:
 
     steps:
     - name: Upload firmware directory
-      if: steps.organize_files.outcome == 'success' && !cancelled()
+      # if: steps.organize_files.outcome == 'success' && !cancelled()
       uses: actions/upload-artifact@master
       with:
         name: OpenWrt_x86_64_firmware_VM_${{ env.FILE_DATE }}
