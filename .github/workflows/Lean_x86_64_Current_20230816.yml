@@ -95,15 +95,44 @@ jobs:
       run: |	
         rm -rf openwrt/package/lean/luci-app-docker
         # git clone https://github.com/KFERMercer/luci-app-dockerman.git openwrt/package/lean/luci-app-dockerman
-        git clone https://github.com/fw876/helloworld.git openwrt/package/lean/luci-app-ssr-plus
-        git clone https://github.com/rufengsuixing/luci-app-adguardhome.git openwrt/package/lean/luci-app-adguardhome
-        git clone -b master https://github.com/vernesong/OpenClash.git openwrt/package/lean/OpenClash
+        # git clone https://github.com/fw876/helloworld.git openwrt/package/lean/luci-app-ssr-plus
+        # git clone https://github.com/rufengsuixing/luci-app-adguardhome.git openwrt/package/lean/luci-app-adguardhome
+        # git clone -b master https://github.com/vernesong/OpenClash.git openwrt/package/lean/OpenClash
         # cd openwrt/package	
         # mkdir coolapps	
         # cd coolapps
         # git clone https://github.com/Lienol/openwrt-package.git	
         # mv openwrt-package/luci-app-ssr-mudb-server ./luci-app-ssr-mudb-server	
         # rm -rf openwrt-package
+        # echo "======================="
+        # echo "Space usage:"
+        # echo "======================="
+        # df -h
+        # echo "======================="
+
+        git clone https://github.com/fw876/helloworld.git openwrt/package/fw876/helloworld
+        mv openwrt/package/fw876/helloworld/luci-app-ssr-plus openwrt/package/lean/luci-app-ssr-plus
+        rm -rf openwrt/package/fw876/helloworld
+        echo "======================="
+        echo "Space usage:"
+        echo "======================="
+        df -h
+        echo "======================="
+        git clone https://github.com/rufengsuixing/luci-app-adguardhome.git openwrt/package/lean/luci-app-adguardhome
+        echo "======================="
+        echo "Space usage:"
+        echo "======================="
+        df -h
+        echo "======================="
+        git clone -b master https://github.com/vernesong/OpenClash.git openwrt/package/lean/OpenClash
+        echo "======================="
+        echo "Space usage:"
+        echo "======================="
+        df -h
+        echo "======================="
+        git clone https://github.com/Lienol/openwrt-package.git	openwrt/package/Lienol/openwrt-package
+        mv openwrt/package/Lienol/openwrt-package/luci-app-ssr-mudb-server openwrt/package/lean/luci-app-ssr-mudb-server
+        rm -rf openwrt/package/Lienol/openwrt-package
         echo "======================="
         echo "Space usage:"
         echo "======================="
@@ -132,6 +161,11 @@ jobs:
     - name: Download package
       id: package
       run: |
+        echo "======================="
+        echo "Space usage:"
+        echo "======================="
+        df -h
+        echo "======================="
         cd openwrt
         make defconfig
         make download -j8
