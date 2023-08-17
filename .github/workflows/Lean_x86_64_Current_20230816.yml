@@ -20,6 +20,7 @@
 #     11. Update this action code (2020.10.20)
 #     12. Update to change set-env to echo "" >> $GITHUB_ENV (2020.11.19)
 #     13. Update "Initialization environment" (2023.05.09)
+#     14. Update with help from ChatGPT (2023.08.16)
 
 name: Build Openwrt Lean x86_64
 
@@ -27,9 +28,9 @@ on:
   repository_dispatch:
   release:
     types: published
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
     paths:
       - 'x86_64.config'
       - 'diy.sh'
@@ -50,9 +51,8 @@ env:
   TZ: America/Los_Angeles
 
 jobs:
-  build:
+  initialize:
     runs-on: ubuntu-22.04
-    if: github.event.repository.owner.id == github.event.sender.id
 
     steps:
     - name: Checkout
@@ -75,56 +75,78 @@ jobs:
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
 
+  clone_source_code:
+    runs-on: ubuntu-22.04
+    needs: initialize
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+
     - name: Clone source code
       working-directory: /workdir
+      if: steps.initialize.outcome == 'success'
       run: |
         df -hT $PWD
         git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
-        
-    # - name: Load custom feeds
-    #   run: |
-        # [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
-        # chmod +x $DIY_P1_SH
-        # cd openwrt
-        # $GITHUB_WORKSPACE/$DIY_P1_SH
 
-    - name: Clone custom source code	
-      run: |	
+  clone_custom_code:
+    runs-on: ubuntu-22.04
+    needs: clone_source_code
+
+    steps:
+    - name: Clone custom source code
+      if: steps.clone_source_code.outcome == 'success'
+      run: |
         rm -rf openwrt/package/lean/luci-app-docker
         # git clone https://github.com/KFERMercer/luci-app-dockerman.git openwrt/package/lean/luci-app-dockerman
         git clone https://github.com/fw876/helloworld.git openwrt/package/lean/luci-app-ssr-plus
         git clone https://github.com/rufengsuixing/luci-app-adguardhome.git openwrt/package/lean/luci-app-adguardhome
         git clone -b master https://github.com/vernesong/OpenClash.git openwrt/package/lean/OpenClash
-        cd openwrt/package	
-        mkdir coolapps	
+        cd openwrt/package
+        mkdir coolapps
         cd coolapps
-        git clone https://github.com/Lienol/openwrt-package.git	
-        mv openwrt-package/luci-app-ssr-mudb-server ./luci-app-ssr-mudb-server	
+        git clone https://github.com/Lienol/openwrt-package.git
+        mv openwrt-package/luci-app-ssr-mudb-server ./luci-app-ssr-mudb-server
         rm -rf openwrt-package
 
+  update_and_install:
+    runs-on: ubuntu-22.04
+    needs: clone_custom_code
+
+    steps:
     - name: Update feeds
+      if: steps.clone_custom_code.outcome == 'success'
       run: cd openwrt && ./scripts/feeds update -a
 
     - name: Install feeds
+      if: steps.update_and_install.outcome == 'success'
       run: cd openwrt && ./scripts/feeds install -a
 
+  load_custom_config:
+    runs-on: ubuntu-22.04
+    needs: update_and_install
+
+    steps:
     - name: Load custom configuration
+      if: steps.update_and_install.outcome == 'success'
       run: |
         #[ -e files ] && mv files openwrt/files
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
-        rm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm	
-        mv nlbw/display.htm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm	
+        rm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm
+        mv nlbw/display.htm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm
         chmod +x $DIY_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_SH
 
-    # - name: SSH connection to Actions
-    #   uses: P3TERX/debugger-action@master
-    #   if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
+  download_and_compile:
+    runs-on: ubuntu-22.04
+    needs: load_custom_config
 
+    steps:
     - name: Download package
-      id: package
+      if: steps.load_custom_config.outcome == 'success'
       run: |
         cd openwrt
         make defconfig
@@ -133,7 +155,7 @@ jobs:
         find dl -size -1024c -exec rm -f {} \;
 
     - name: Compile the firmware
-      id: compile
+      if: steps.download_and_compile.outcome == 'success'
       run: |
         cd openwrt
         echo -e "$(nproc) thread compile"
@@ -141,38 +163,54 @@ jobs:
         echo "status=success" >> $GITHUB_OUTPUT
         echo "FILE_DATE=$(date +"%Y-%m-%d_%H-%M")" >> $GITHUB_ENV
 
-    - name: Check space usage
-      if: (!cancelled())
-      run: df -hT
+  reduce_file_size:
+    runs-on: ubuntu-22.04
+    needs: download_and_compile
 
-    - name: Reduce file size	
-      run: |	
-        find openwrt/bin/targets/ -name "*rootfs*img*" -delete	
+    steps:
+    - name: Reduce file size
+      if: steps.download_and_compile.outcome == 'success'
+      run: |
+        find openwrt/bin/targets/ -name "*rootfs*img*" -delete
         find openwrt/bin/targets/ -name "*vmlinuz" -delete
         find openwrt/bin/targets/ -name "*uefi*vmdk*" -delete
         find openwrt/bin/targets/ -name "*efi*vmdk*" -delete
         find openwrt/bin/targets/ -name "*uefi*img*" -delete
         find openwrt/bin/targets/ -name "*efi*img*" -delete
 
+  upload_bin_directory:
+    runs-on: ubuntu-22.04
+    needs: reduce_file_size
+
+    steps:
     - name: Upload bin directory
+      if: steps.reduce_file_size.outcome == 'success' && env.UPLOAD_BIN_DIR == 'true'
       uses: actions/upload-artifact@master
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
         name: OpenWrt_x86_64_VM_${{ env.FILE_DATE }}
         path: openwrt/bin
 
+  organize_files:
+    runs-on: ubuntu-22.04
+    needs: upload_bin_directory
+
+    steps:
     - name: Organize files
-      id: organize
-      if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+      if: steps.upload_bin_directory.outcome == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
         cd openwrt/bin/targets/*/*
         rm -rf packages
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
 
+  upload_firmware_directory:
+    runs-on: ubuntu-22.04
+    needs: organize_files
+
+    steps:
     - name: Upload firmware directory
+      if: steps.organize_files.outcome == 'success' && !cancelled()
       uses: actions/upload-artifact@master
-      if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
         name: OpenWrt_x86_64_firmware_VM_${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
