@@ -111,8 +111,8 @@ jobs:
         # echo "======================="
 
         git clone https://github.com/fw876/helloworld.git openwrt/package/fw876/helloworld
-        mv openwrt/package/fw876/helloworld/luci-app-ssr-plus openwrt/package/lean/luci-app-ssr-plus
-        rm -rf openwrt/package/fw876/helloworld
+        # mv openwrt/package/fw876/helloworld/luci-app-ssr-plus openwrt/package/lean/luci-app-ssr-plus
+        # rm -rf openwrt/package/fw876/helloworld
         echo "======================="
         echo "Space usage:"
         echo "======================="
