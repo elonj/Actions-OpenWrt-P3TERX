@@ -23,7 +23,7 @@
 #     14. Update code (2023.08.17)
 #     15. Remove "moby*" from line 68 "sudo -E apt -y purge" due to run error. (2023.08.31)
 #     16. Get main branch of helloworld. (2023.11.27)
-#     17. Change "actions/upload-artifact@v3" to "actions/upload-artifact@v4". (2024.01.29)
+#     17. Change "actions/upload-artifact@v3" to "actions/upload-artifact@v4", "actions/checkout@v3" to "actions/checkout@v4". (2024.01.29)
 
 name: Build Openwrt Lean x86_64
 
@@ -78,7 +78,7 @@ jobs:
         sudo chown $USER:$GROUPS /workdir
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Clone source code
       working-directory: /workdir
