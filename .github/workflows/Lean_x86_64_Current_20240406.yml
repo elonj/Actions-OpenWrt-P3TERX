@@ -115,7 +115,6 @@ jobs:
         # echo "======================="
 
         git clone -b main https://github.com/fw876/helloworld.git openwrt/package/fw876/helloworld
-        CGO_ENABLED=1 go build openwrt/package/fw876/helloworld/mosdns
         # mv openwrt/package/fw876/helloworld/luci-app-ssr-plus openwrt/package/lean/luci-app-ssr-plus
         # rm -rf openwrt/package/fw876/helloworld
         echo "======================="
@@ -145,7 +144,7 @@ jobs:
         echo "======================="
         df -h
         echo "======================="
-
+        
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
 
@@ -183,6 +182,12 @@ jobs:
         echo "======================="
         df -h
         echo "======================="
+
+    - name: Set CGO_ENABLED for mosdns
+      run: |
+        if [ "PKG_NAME" = "mosdns" ]; then
+          export CGO_ENABLED=1
+        fi
 
     - name: Compile the firmware
       id: compile
