@@ -24,6 +24,7 @@
 #     15. Remove "moby*" from line 68 "sudo -E apt -y purge" due to run error. (2023.08.31)
 #     16. Get main branch of helloworld. (2023.11.27)
 #     17. Change "actions/upload-artifact@v3" to "actions/upload-artifact@v4", "actions/checkout@v3" to "actions/checkout@v4". (2024.01.29)
+#     18. Add CGO_ENABLED=1 for build of mosdns to complete Openwrt built. (2024.04.06)
 
 name: Build Openwrt Lean x86_64
 
@@ -116,6 +117,8 @@ jobs:
         git clone -b main https://github.com/fw876/helloworld.git openwrt/package/fw876/helloworld
         # mv openwrt/package/fw876/helloworld/luci-app-ssr-plus openwrt/package/lean/luci-app-ssr-plus
         # rm -rf openwrt/package/fw876/helloworld
+        sed -i '$a\GO_PKG_TARGET_VARS:=$(filter-out CGO_ENABLED=%,$(GO_PKG_TARGET_VARS)) CGO_ENABLED=1' openwrt/package/fw876/helloworld/mosdns/Makefile
+        
         echo "======================="
         echo "Space usage:"
         echo "======================="
