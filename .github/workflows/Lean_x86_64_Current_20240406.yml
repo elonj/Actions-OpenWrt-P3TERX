@@ -117,7 +117,8 @@ jobs:
         git clone -b main https://github.com/fw876/helloworld.git openwrt/package/fw876/helloworld
         # mv openwrt/package/fw876/helloworld/luci-app-ssr-plus openwrt/package/lean/luci-app-ssr-plus
         # rm -rf openwrt/package/fw876/helloworld
-        sed -i '$a\GO_PKG_TARGET_VARS:=$(filter-out CGO_ENABLED=%,$(GO_PKG_TARGET_VARS)) CGO_ENABLED=1' openwrt/package/fw876/helloworld/mosdns/Makefile
+        sed -i '38a\GO_PKG_TARGET_VARS:=$(filter-out CGO_ENABLED=%,$(GO_PKG_TARGET_VARS)) CGO_ENABLED=1' openwrt/package/fw876/helloworld/mosdns/Makefile
+        cat openwrt/package/fw876/helloworld/mosdns/Makefile
         
         echo "======================="
         echo "Space usage:"
