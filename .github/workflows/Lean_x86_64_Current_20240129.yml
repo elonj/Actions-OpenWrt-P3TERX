@@ -24,7 +24,6 @@
 #     15. Remove "moby*" from line 68 "sudo -E apt -y purge" due to run error. (2023.08.31)
 #     16. Get main branch of helloworld. (2023.11.27)
 #     17. Change "actions/upload-artifact@v3" to "actions/upload-artifact@v4", "actions/checkout@v3" to "actions/checkout@v4". (2024.01.29)
-#     18. Add "CGO_ENABLED=1" for build of mosdns in order to complete Openwrt build. (2024.04.06)
 
 name: Build Openwrt Lean x86_64
 
@@ -182,12 +181,6 @@ jobs:
         echo "======================="
         df -h
         echo "======================="
-
-    - name: Set CGO_ENABLED for mosdns
-      run: |
-        if [ "PKG_NAME" = "mosdns" ]; then
-          export CGO_ENABLED=1
-        fi
 
     - name: Compile the firmware
       id: compile
