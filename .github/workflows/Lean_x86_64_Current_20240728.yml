@@ -90,16 +90,16 @@ jobs:
         npm_clean: "True"
         os_swap: "True"
 
-    - name: Freeing up disk space
-      uses: easimon/maximize-build-space@master
-      with: 
-        root-reserve-mb: 2048
-        swap-size-mb: 1
-        remove-dotnet: 'true'
-        remove-android: 'true'
-        remove-haskell: 'true'
-        remove-codeql: 'true'
-        remove-docker-images: 'true'
+    # - name: Freeing up disk space
+    #   uses: easimon/maximize-build-space@master
+    #   with: 
+    #     root-reserve-mb: 2048
+    #     swap-size-mb: 1
+    #     remove-dotnet: 'true'
+    #     remove-android: 'true'
+    #     remove-haskell: 'true'
+    #     remove-codeql: 'true'
+    #     remove-docker-images: 'true'
 
     - name: Free up disk space complete
       run: |
@@ -116,7 +116,7 @@ jobs:
         DEBIAN_FRONTEND: noninteractive
       run: |
         # docker rmi `docker images -q`
-        # sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android
+        sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android
         # sudo -E apt-mark hold grub-efi-amd64-signed
         sudo -E apt update
         sudo -E apt -y purge azure-cli* docker* ghc* zulu* llvm* firefox google* dotnet* powershell* openjdk* mysql* php* mongodb* dotnet* snap*
