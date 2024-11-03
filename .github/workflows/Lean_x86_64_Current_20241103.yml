@@ -27,6 +27,7 @@
 #     18. Add CGO_ENABLED=1 for build of mosdns to complete Openwrt built. (2024.04.06)
 #     19. Add "git clone --depth=1“ to pull the latest code only. (2024.06.19)
 #     20. Add code to free space per "https://github.com/rrtft/ActionsBuildOpenWRT/blob/main/.github/workflows/build-x86_64_ipv4.yml". (2024.07.28)
+#     21. Commented "luci-app-nlbwmon/luasrc/view/nlbw/display.htm". (2024.11.03)
 
 name: Build Openwrt Lean x86_64
 
@@ -209,8 +210,8 @@ jobs:
       run: |
         #[ -e files ] && mv files openwrt/files
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
-        rm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm	
-        mv nlbw/display.htm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm	
+        # rm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm	
+        # mv nlbw/display.htm openwrt/feeds/luci/applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm	
         chmod +x $DIY_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_SH
